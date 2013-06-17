@@ -1,171 +1,109 @@
-define(function () {
-    function CanvasRenderer() {
-        this.faces = [];
-        this.vertices = [];
+define(["./lib/Octree", "./lib/gl-matrix"], function (Quadtree, glMatrix) {
+    function CanvasRenderer(canvas, camera) {
+        this.context = canvas.getContext("2d");
+        this.camera = camera;
+        this.resolution = camera.camera.size;
+
+        var vP = [
+            this.resolution[0]/2,0,0,0,
+            0,-this.resolution[1]/2,0,0,
+            0,0,1,0,
+            this.resolution[0]/2, this.resolution[1]/2,0,1
+        ];
+
+        //matrix multiplication is associative, it means that we can precalculate camera matrix...
+        this.M = glMatrix.mat4.multiply(glMatrix.mat4.create(), this.camera.camera.projectionMatrix, this.camera.transform.worldToLocal);
+        glMatrix.mat4.multiply(this.M, vP, this.M);
+        var that = this;
+        //...and keep it updated each time, when camera's worldTolocal matrix changes.
+        camera.transform.AddListener(camera.transform.events.Update, function(transform){
+            glMatrix.mat4.multiply(that.M, transform.gameObject.camera.projectionMatrix, transform.getLocalToWorld());
+            glMatrix.mat4.multiply(that.M, vP, that.M);
+        });
     }
 
     var p = CanvasRenderer.prototype;
 
-    p.faces = null;
+    p.Render = function () {
+        this.context.clearRect(0, 0, this.resolution[0], this.resolution[1]);
 
-    p.vertices = null;
+        var camera = this.camera,
+            gameObjects = camera.world.Retrieve(camera),
+            //gameObjects = camera.world.gameObjects;
+            gameObjectsCount = gameObjects.length;
+            
+            console.log(gameObjectsCount);
 
-    p.viewport = null;
-
-    p.Render = function (viewport) {
-        this.viewport = viewport;
-        this.viewport.context.clearRect(0, 0, viewport.size[0], viewport.size[1]);
-        var i, j, gameObject, vertices, vertex, verticesCount,
-            faces, facesCount, face, localVertex, localFace,
-            glMatrix = scaliaEngine.utils.glMatrix,
-            camera = viewport.camera,
-            cameraComponent = camera.camera,
-            gameObjects = cameraComponent.visibles,
-            gameObjectsCount = gameObjects.length,
-            allVertices = this.vertices,
-            allFaces = this.faces,
-            offset = 0,
-            facesOffset = 0,
-            vector = [0, 0, 0];
-
-        for(var i = 0; i < gameObjectsCount; i++){
+        for (var i = 0; i < gameObjectsCount; i++) {
             var gameObject = gameObjects[i];
-            if(gameObject.mesh !== undefined){
-                this.RenderMesh(gameObject.mesh);
-            }else if(gameObject.sprite !== undefined){
+            
+            this.RenderAxis(gameObject);
+            
+            if (gameObject.sprite !== undefined) {
                 this.RenderSprite(gameObject.sprite);
             }
         }
     }
 
+    var bufferVec3 = [0,0,0];
 
-
-    var va = [], vb = [], vr = [];
-    p.IsBackFace = function (v1, v2, v3) {
-        var vec3 = scaliaEngine.utils.glMatrix.vec3;
-
-        vec3.subtract(va, v1, v2);
-        vec3.subtract(vb, v1, v3);
-        vec3.cross(vr, va, vb);
-
-        return vr[2] < 0;
+    p.RenderSprite = function (sprite) {
+        glMatrix.vec3.transformMat4(bufferVec3, sprite.gameObject.transform.getPosition(), this.M);
+        this.context.drawImage(sprite.image, 0, 0, sprite.width, sprite.height, (bufferVec3[0] - sprite.pivot[0]) | 0, (bufferVec3[1] - sprite.pivot[1]) | 0, sprite.width, sprite.height);
     }
+    
+    p.RenderAxis = function(gameObject){
+        var W = gameObject.transform.getLocalToWorld(),
+                pos0 = gameObject.transform.getPosition();
 
-    p.RenderSprite = function(sprite){
-        transformedVertex = [0,0,0];
-        scaliaEngine.utils.glMatrix.vec3.copy(transformedVertex, transformedVertex);
-        scaliaEngine.utils.glMatrix.vec3.transformMat4(transformedVertex, transformedVertex, sprite.gameObject.transform.worldMatrix);
-        scaliaEngine.utils.glMatrix.vec3.transformMat4(transformedVertex, transformedVertex, this.viewport.camera.transform.worldToLocal);
-        scaliaEngine.utils.glMatrix.vec3.transformMat4(transformedVertex, transformedVertex, this.viewport.camera.camera.projectionMatrix);
+        glMatrix.vec3.transformMat4(pos0, pos0, this.M);
 
-        transformedVertex[0] = transformedVertex[0] * this.viewport.size[0] / 2 + this.viewport.size[0] / 2 - sprite.pivot[0];
-        transformedVertex[1] = transformedVertex[1] * this.viewport.size[1] / 2 + this.viewport.size[1] / 2 - sprite.pivot[1];
+        var pos = bufferVec3;
 
-        this.RenderImage(transformedVertex, sprite.image, 0, 0, sprite.width, sprite.height);
-    }
+        //draw X
+        pos[0] = 100;
+        pos[1] = 0;
+        pos[2] = 0;
+        
+        glMatrix.vec3.transformMat4(pos, pos, W);
+        glMatrix.vec3.transformMat4(pos, pos, this.M);
+        
+        this.context.beginPath();
+        this.context.moveTo(pos0[0], pos0[1]);
+        this.context.lineTo(pos[0], pos[1]);
+        this.context.closePath();
+        this.context.strokeStyle = '#ff0000';
+        this.context.stroke();
+        
+        //draw Y
+        pos[0] = 0;
+        pos[1] = 100;
+        pos[2] = 0;
+        
+        glMatrix.vec3.transformMat4(pos, pos, W);
+        glMatrix.vec3.transformMat4(pos, pos, this.M);
+        
+        this.context.beginPath();
+        this.context.moveTo(pos0[0], pos0[1]);
+        this.context.lineTo(pos[0], pos[1]);
+        this.context.closePath();
+        this.context.strokeStyle = '#00ff00';
+        this.context.stroke();     
 
-    p.RenderMesh = function (mesh) {
-        var vertices = [];
-
-        var glMatrix = scaliaEngine.utils.glMatrix;
-
-        //transform vertices
-        for (var i = 0; i < mesh.vertices.length; i++) {
-            var vertex = mesh.vertices[i];
-
-            var transformedVertex = vertices[i] = [];
-
-            glMatrix.vec3.add(transformedVertex, vertex, mesh.pivot);
-            glMatrix.vec3.transformMat4(transformedVertex, transformedVertex, mesh.gameObject.transform.worldMatrix);
-            glMatrix.vec3.transformMat4(transformedVertex, transformedVertex, this.viewport.camera.transform.worldToLocal);
-            glMatrix.vec3.transformMat4(transformedVertex, transformedVertex, this.viewport.camera.camera.projectionMatrix);
-
-            transformedVertex[0] = transformedVertex[0] * this.viewport.size[0] / 2 + this.viewport.size[0] / 2;
-            transformedVertex[1] = transformedVertex[1] * this.viewport.size[1] / 2 + this.viewport.size[1] / 2;
-        }
-
-        //transform face normals
-        /*for (var i = 0; i < mesh.faceNormals.length; i++) {
-            var vertex = mesh.vertices[i];
-
-            var transformedVertex = vertices[i] = [];
-
-            glMatrix.vec3.add(transformedVertex, vertex, mesh.pivot);
-            glMatrix.vec3.transformMat4(transformedVertex, transformedVertex, mesh.gameObject.transform.worldMatrix);
-            glMatrix.vec3.transformMat4(transformedVertex, transformedVertex, this.viewport.camera.transform.worldToLocal);
-            glMatrix.vec3.transformMat4(transformedVertex, transformedVertex, this.viewport.camera.camera.projectionMatrix);
-
-            transformedVertex[0] = transformedVertex[0] * this.viewport.size[0] / 2 + this.viewport.size[0] / 2;
-            transformedVertex[1] = transformedVertex[1] * this.viewport.size[1] / 2 + this.viewport.size[1] / 2;
-        }*/
-
-        //transform face
-        for (var i = 0; i < mesh.faces.length; i++) {
-            var face = mesh.faces[i];
-
-           if(face.length !== 2)
-                if(this.IsBackFace(vertices[face[0]], vertices[face[1]], vertices[face[2]])) continue;
-
-            if(face.length === 3){
-                this.RenderFace3(vertices[face[0]], vertices[face[1]], vertices[face[2]], mesh.colors[mesh.faceColors[i][1]]);
-            }else if(face.length === 4){
-                this.RenderFace4(vertices[face[0]], vertices[face[1]], vertices[face[2]], vertices[face[3]], mesh.gameObject.color);
-            }else if(face.length === 2){
-                this.RenderLine(vertices[face[0]], vertices[face[1]], mesh.gameObject.color, 1);
-            }else{
-                throw "Face has wrong vertex count";
-            }
-        }
-    }
-
-    p.RenderFace3 = function (v1, v2, v3, color) {
-        var ctx = this.viewport.context;
-
-        ctx.fillStyle = color;
-
-        ctx.beginPath();
-        ctx.moveTo(v1[0], v1[1]);
-        ctx.lineTo(v2[0], v2[1]);
-        ctx.lineTo(v3[0], v3[1]);
-        ctx.closePath();
-
-        ctx.fill();
-        //ctx.stroke();
-    }
-
-    p.RenderFace4 = function (v1, v2, v3, v4, color) {
-        var ctx = this.viewport.context;
-
-        ctx.fillStyle = color;
-
-        ctx.beginPath();
-        ctx.moveTo(v1[0], v1[1]);
-        ctx.lineTo(v2[0], v2[1]);
-        ctx.lineTo(v3[0], v3[1]);
-        ctx.lineTo(v4[0], v4[1]);
-        ctx.closePath();
-
-        ctx.fill();
-        //ctx.stroke();
-    }
-
-    p.RenderImage = function(v, image, x, y, w, h){
-        var ctx = this.viewport.context;
-        ctx.drawImage(image, x | 0, y | 0, w, h, v[0] | 0, v[1] | 0, w, h);
-    }
-
-    p.RenderLine = function(v0, v1, color, width){
-        var ctx = this.viewport.context;
-
-        ctx.strokeStyle = color;
-
-        ctx.beginPath();
-        ctx.moveTo(v0[0], v0[1]);
-        ctx.lineTo(v1[0], v1[1]);
-        ctx.closePath();
-
-        ctx.lineWidth = width;
-        ctx.stroke();
+        //draw Y
+        pos[0] = 0;
+        pos[1] = 0;
+        pos[2] = 100;
+        
+        glMatrix.vec3.transformMat4(pos, pos, W);
+        glMatrix.vec3.transformMat4(pos, pos, this.M);
+        
+        this.context.beginPath();
+        this.context.moveTo(pos0[0], pos0[1]);
+        this.context.lineTo(pos[0], pos[1]);
+        this.context.closePath();
+        this.context.strokeStyle = '#0000ff';
+        this.context.stroke();   
     }
 
     return CanvasRenderer;

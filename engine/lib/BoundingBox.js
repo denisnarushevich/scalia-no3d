@@ -1,6 +1,8 @@
 define(function(){
-    function BoundingBox(){
-        
+    var BoundingBox = {};
+
+    BoundingBox.Create = function(min, max){
+        return [min, max];
     }
 
     /**
@@ -8,7 +10,7 @@ define(function(){
      * @param {Array} vertices
      * @return {BoundingBox}
      */
-    BoundingBox.Calculate = function(vertices){
+    BoundingBox.Calculate = function(boundingBox, vertices){
         var maxX = 0,
             minX = 0,
             maxY = 0,
@@ -40,27 +42,23 @@ define(function(){
                 minZ = vertex[2];
         }
 
-        var bbox = new BoundingBox();
+        boundingBox[0] = [minX, minY, minZ];
+        boundingBox[1] = [maxX, maxY, maxZ];
 
-        bbox.minPoint = [minX, minY, minZ];
-        bbox.maxPoint = [maxX, maxY, maxZ];
-        bbox.position = [maxX - (maxX - minX)/2, maxY - (maxY - minY)/2, maxZ - (maxZ - minZ)/2];
-
-        return bbox;
+        return boundingBox;
     }
-    
-    var p = BoundingBox.prototype;
 
+    BoundingBox.Intersects = function(a, b){
+        return !(a[0][0] > b[1][0] || a[1][0] < b[0][0] || a[0][1] > b[1][1] || a[1][1] < b[0][1] || a[0][2] > b[1][2] || a[1][2] < b[0][2]);
+    }
 
-    /**
-     * Position of center point, relatively to objects center point
-     * @type {int[]}
-     */
-    p.position = null;
+    BoundingBox.Contains = function(a, b){
+        return b[0][0] >= a[0][0] && b[1][0] <= a[1][0] && b[0][1] >= a[0][1] && b[1][1] <= a[1][1] && b[0][2] >= a[0][2] && b[1][2] <= a[1][2];
+    }
 
-    p.minPoint = null;
-
-    p.maxPoint = null;
+    BoundingBox.ContainsPoint = function(box, point){
+        return point[0] >= box[0][0] && point[0] <= box[1][0] && point[1] >= box[0][1] && point[1] <= box[1][1] && point[2] >= box[0][2] && point[2] <= box[1][2];
+    }
 
     return BoundingBox;
-})
+});

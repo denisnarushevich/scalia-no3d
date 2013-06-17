@@ -1,7 +1,7 @@
 define(["../GameObject", "../components/CameraComponent"], function (GameObject, CameraComponent) {
-    function CameraObject() {
+    function CameraObject(width, height, length) {
         GameObject.call(this);
-        this.AddComponent(new CameraComponent(this));
+        this.AddComponent(new CameraComponent(this, width, height, length));
     }
 
     var p = CameraObject.prototype = Object.create(GameObject.prototype);

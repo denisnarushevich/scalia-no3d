@@ -1,4 +1,4 @@
-define(["../Component"], function (Component) {
+define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
     /**
      * Create Transform component.
      * Every component has a game object.
@@ -8,31 +8,28 @@ define(["../Component"], function (Component) {
     function Transform(gameObject) {
         Component.call(this, gameObject);
 
-        this.position = [
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1
-        ];
-
-        this.eulerRotation = [0, 0, 0];
-        this.quatRotation = [0, 0, 0, 1];
-        this.scale = [1, 1, 1];
+        this.bufferVec3 = [0,0,0];
+        this.bufferMat4 = [];
+        
+        this.position = [0, 0, 0];
+        this.localPosition = [0,0,0];
 
         this.children = [];
 
-        this.localMatrix = [
+        this.local = [
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1
         ];
-        this.worldMatrix = [
+
+        this.localToWorld = [
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1
         ];
+
         this.worldToLocal = [
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -43,181 +40,177 @@ define(["../Component"], function (Component) {
 
     var p = Transform.prototype = Object.create(Component.prototype);
 
-    /**
-     * The position of the transform in world space.
-     * @type {Vec3}
-     * @read-only
-     */
+    p.dirty = true;
+
     p.position = null;
 
-    /**
-     * Position of the transform relative to the parent transform.
-     * @type {Vec3}
-     * @read-only
-     */
     p.localPosition = null;
 
-    /**
-     * Rotation of the transform relative to world.
-     * @type {Vec3}
-     * @read-only
-     */
     p.rotation = null;
 
-    /**
-     * Rotation of the transform relative to parent transform.
-     * @type {Vec3}
-     * @read-only
-     */
     p.localRotation = null;
 
-    /**
-     * Scale of the transform relative to world.
-     * @type {Ve3}
-     * @read-only
-     */
-    p.scale = null;
+    p.local = null;
 
-    /**
-     * Scale of the transform relative to parent.
-     * @type {Vec3}
-     * @read-only
-     */
-    p.localScale = null;
-
-    /**
-     *
-     * @type {Mat4}
-     */
     p.worldMatrix = null;
 
-    p.localMatrix = null;
-
     p.worldToLocal = null;
-
-    /**
-     * @type {Transform[]}
-     * @read-only
-     */
+ 
     p.children = null;
 
-    /**
-     * Parent transform.
-     * @read-only
-     * @type {Transform}
-     */
     p.parent = null;
 
     /**
      * @param {Transform} children
      */
-    p.AddChildren = function (children) {
+    p.AddChildren = function(children) {
         children.parent = this;
         this.children[this.children.length] = children;
         this.CalculateLocalMatrix();
     }
 
-    /**
-     * @param {int} x
-     * @param {int} y
-     * @param {int} z
-     */
-    p.SetPosition = function (x, y, z) {
-        this.position[0] = x;
-        this.position[1] = y;
-        this.position[2] = z;
-
-        this.UpdateMatrices();
-    }
-
-    p.SetScale = function(x, y, z){
-        this.scale[0] = x;
-        this.scale[1] = y;
-        this.scale[2] = z;
-
-        this.UpdateMatrices();
-    }
-
-    p.SetRotation = function(x, y, z){
-        //wtf?! where's quat?!
-        this.rotation[0] = x % 360;
-        this.rotation[1] = y % 360;
-        this.rotation[2] = z % 360;
-
-        this.UpdateMatrices();
-    }
-
-    p.UpdateMatrices = function(){
+    p.UpdateMatrices = function() {
         this.UpdateLocalMatrix();
         this.UpdateWorldMatrix();
 
-        for(var i = 0; i < this.children.length; i++){
+        for (var i = 0; i < this.children.length; i++) {
             this.children[i].UpdateMatrices();
         }
 
         this.DispatchEvent(this.events.Update, this);
     }
 
-    p.UpdateLocalMatrix = function(){
-        var mat4 = scaliaEngine.utils.glMatrix.mat4;
-        mat4.fromRotationTranslation(this.localMatrix, this.quatRotation, this.position);
-        mat4.scale(this.localMatrix, this.localMatrix, this.scale);
+    /*  p.UpdateLocalMatrix = function() {
+     
+     glMatrix.mat4.fromRotationTranslation(this.localMatrix, this.quatRotation, this.position);
+     glMatrix.mat4.scale(this.localMatrix, this.localMatrix, this.scale);
+     }
+     */
+
+
+    p.translate = function(x, y, z, relativeTo) {
+        var inputVec = this.bufferVec3,
+                tmpMat = this.bufferMat4;
+        
+        inputVec[0] = x;
+        inputVec[1] = y;
+        inputVec[2] = z;
+        
+        if (relativeTo === "world") {
+            glMatrix.mat4.identity(tmpMat);
+            glMatrix.mat4.translate(tmpMat, tmpMat, inputVec);
+            glMatrix.mat4.multiply(this.local, tmpMat, this.local);
+        }else
+            glMatrix.mat4.translate(this.local, this.local, inputVec);
+
+        this.dirty = true;
+
+        this.DispatchEvent(this.events.Update, this);
     }
 
-    p.UpdateWorldMatrix = function(){
-        var mat4 = scaliaEngine.utils.glMatrix.mat4;
-        if(this.parent === null)
-            mat4.copy(this.worldMatrix, this.localMatrix);
-        else
-            mat4.multiply(this.worldMatrix, this.parent.worldMatrix, this.localMatrix);
-
-        mat4.invert(this.worldToLocal, this.worldMatrix);
-    }
-
-    p.Rotate = function (x, y, z, relativeTo) {
-        //this.SetRotation(this.rotation[0] + x, this.rotation[1] + y, this.rotation[2] + z);
+    p.rotate = function(x, y, z, relativeTo) {
         var degreeToRad = Math.PI / 180;
 
-        if(relativeTo === "world"){
-            var quat = [0,0,0,1];
+        if (relativeTo === "world") {
+            var tmp = glMatrix.mat4.create();
 
-            scaliaEngine.utils.glMatrix.quat.rotateZ(quat, quat, z * degreeToRad);
-            scaliaEngine.utils.glMatrix.quat.rotateY(quat, quat, y * degreeToRad);
-            scaliaEngine.utils.glMatrix.quat.rotateX(quat, quat, x * degreeToRad);
+            glMatrix.mat4.rotateZ(tmp, tmp, z * degreeToRad);
+            glMatrix.mat4.rotateY(tmp, tmp, y * degreeToRad);
+            glMatrix.mat4.rotateX(tmp, tmp, x * degreeToRad);
 
-            scaliaEngine.utils.glMatrix.quat.multiply(this.quatRotation, quat, this.quatRotation);
+            glMatrix.mat4.multiply(this.local, tmp, this.local);
         }else{
-            scaliaEngine.utils.glMatrix.quat.rotateZ(this.quatRotation, this.quatRotation, z * degreeToRad);
-            scaliaEngine.utils.glMatrix.quat.rotateY(this.quatRotation, this.quatRotation, y * degreeToRad);
-            scaliaEngine.utils.glMatrix.quat.rotateX(this.quatRotation, this.quatRotation, x * degreeToRad);
+            glMatrix.mat4.rotateZ(this.local, this.local, z * degreeToRad);
+            glMatrix.mat4.rotateY(this.local, this.local, y * degreeToRad);
+            glMatrix.mat4.rotateX(this.local, this.local, x * degreeToRad);
         }
 
-        this.UpdateMatrices();
+        this.dirty = true;
+
+        this.DispatchEvent(this.events.Update, this);
     }
 
-    p.Translate = function(x, y, z, relativeTo){
-        r = [x, y, z];
+    p.getLocalToWorld = function() { //FIX: transformation operations doesn't apply if getLocalToWorld isn't called first.
+        if (this.dirty === true) {
+            if (this.parent === null) {
+                glMatrix.mat4.copy(this.localToWorld, this.local);
+            } else {
+                glMatrix.mat4.multiply(this.localToWorld, this.parent.getLocalToWorld(), this.local)
+                glMatrix.mat4.invert(this.worldToLocal, this.localToWorld);
+            }
 
-        if(relativeTo == "world"){
-            if(this.parent !== null)
-                scaliaEngine.utils.glMatrix.vec3.transformMat4(r, r, this.parent.worldToLocal);
-        }else
-            scaliaEngine.utils.glMatrix.vec3.transformQuat(r, r, this.quatRotation);
+            this.dirty = false;
+        }
 
-        this.SetPosition(this.position[0] + r[0], this.position[1] + r[1], this.position[2] + r[2]);
+        return this.localToWorld;
     }
 
-    p.Scale = function(x, y, z){
-        scaliaEngine.utils.glMatrix.mat4.scale(this.localMatrix, this.localMatrix, [x, y, z]);
+    p.getWorldToLocal = function() {
+        return this.worldToLocal;
     }
 
-    /**
-     * Game tick.
-     * @return {void}
+    p.getPosition = function() {
+        var m = this.getLocalToWorld();
+        this.position[0] = m[12];
+        this.position[1] = m[13];
+        this.position[2] = m[14];
+        return this.position;
+    }
+
+    p.getLocalPosition = function() {
+        var m = this.local;
+        this.localPosition[0] = m[12];
+        this.localPosition[1] = m[13];
+        this.localPosition[2] = m[14];
+        return this.localPosition;
+    }
+
+    p.getRotation = function() {
+        throw "TransformComponent.getRotation not implemented yet";
+    }
+
+    p.getLocalRotation = function() {
+        throw "TransformComponent.getLocalRotation not implemented yet";
+    }
+    /*
+     p.Rotate = function(x, y, z, relativeTo) {
+     var degreeToRad = Math.PI / 180;
+     
+     if (relativeTo === "world") {
+     var quat = [0, 0, 0, 1];
+     
+     scaliaEngine.utils.glMatrix.quat.rotateZ(quat, quat, z * degreeToRad);
+     scaliaEngine.utils.glMatrix.quat.rotateY(quat, quat, y * degreeToRad);
+     scaliaEngine.utils.glMatrix.quat.rotateX(quat, quat, x * degreeToRad);
+     
+     scaliaEngine.utils.glMatrix.quat.multiply(this.quatRotation, quat, this.quatRotation);
+     } else {
+     scaliaEngine.utils.glMatrix.quat.rotateZ(this.quatRotation, this.quatRotation, z * degreeToRad);
+     scaliaEngine.utils.glMatrix.quat.rotateY(this.quatRotation, this.quatRotation, y * degreeToRad);
+     scaliaEngine.utils.glMatrix.quat.rotateX(this.quatRotation, this.quatRotation, x * degreeToRad);
+     }
+     
+     this.UpdateMatrices();
+     }
+     
+     p.Translate = function(x, y, z, relativeTo) {
+     r = [x, y, z];
+     
+     if (relativeTo == "world") {
+     var tmp = glMatrix.mat4.Create();
+     glMatrix.mat4.translate(tmp, tmp, r);
+     glMatrix.mat4.multiply(this.position, tmp, this.position);
+     } else
+     glMatrix.mat4.translate(this.position, this.position, r);
+     
+     this.UpdateMatrices();
+     }
+     
+     p.Scale = function(x, y, z) {
+     glMatrix.mat4.scale(this.localMatrix, this.localMatrix, [x, y, z]);
+     
+     this.UpdateMatrices();
+     }
      */
-    p.Tick = function(){
-
-    }
-
     return Transform;
 });

@@ -1,32 +1,16 @@
-define(["../GameObject", "../components/MeshComponent"], function (GameObject, MeshComponent) {
+define(["../GameObject", "../components/SpriteComponent"], function (GameObject, SpriteComponent) {
     function Plane() {
         GameObject.call(this);
 
+    var sprite = new SpriteComponent(this);
 
-        var r = (Math.random() * 255) | 0,
-            g = (Math.random() * 255) | 0,
-            b = (Math.random() * 255) | 0;
+        sprite.image = new Image();
+        sprite.image.src = "green-ball-small.png";
+        sprite.width = 32;
+        sprite.height = 32;
+        sprite.pivot = [16,16];
 
-
-        this.color = "rgb(" + (r % 100) + "," + (105 + g % 55) + ",0)";
-
-
-        var mesh = new MeshComponent(this);
-
-        mesh.vertices = [
-            [0, 0, 0],
-            [1, 0, 0],
-            [0, 0, 1],
-            [1, 0, 1]
-        ];
-
-        mesh.faces = [
-            [0, 1, 3, 2]
-        ];
-
-        mesh.ComputeFaceNormals();
-
-        this.AddComponent(mesh);
+        this.AddComponent(sprite);
     }
 
     var p = Plane.prototype = Object.create(GameObject.prototype);

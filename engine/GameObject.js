@@ -1,10 +1,10 @@
-define(['./components/TransformComponent', './components/CameraComponent', "./components/MeshComponent", "./components/SpriteComponent"], function (Transform, Camera, Mesh, Sprite) {
+define(['./components/TransformComponent', './components/CameraComponent', "./components/SpriteComponent"], function (Transform, Camera, Sprite) {
     /**
      * Base object
      * @constructor
      */
     function GameObject() {
-        this.id = GameObject.prototype.id++;
+        this.instanceId = GameObject.prototype.instanceId++;
         this.components = [];
         this.AddComponent(new Transform(this));
     }
@@ -14,7 +14,7 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
     /**
      * @type {Number}
      */
-    p.id = 0;
+    p.instanceId = 0;
 
     /**
      * Reference to world object
@@ -54,8 +54,6 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
             this.transform = component;
         }else if(component instanceof Camera){
             this.camera = component;
-        }else if(component instanceof Mesh){
-            this.mesh = component;
         }else if(component instanceof Sprite){
             this.sprite = component;
         }
