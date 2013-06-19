@@ -12,12 +12,12 @@ define(["./lib/Octree", "./lib/gl-matrix"], function (Quadtree, glMatrix) {
         ];
 
         //matrix multiplication is associative, it means that we can precalculate camera matrix...
-        this.M = glMatrix.mat4.multiply(glMatrix.mat4.create(), this.camera.camera.projectionMatrix, this.camera.transform.worldToLocal);
+        this.M = glMatrix.mat4.multiply([], this.camera.camera.projectionMatrix, this.camera.transform.getWorldToLocal());
         glMatrix.mat4.multiply(this.M, vP, this.M);
         var that = this;
         //...and keep it updated each time, when camera's worldTolocal matrix changes.
         camera.transform.AddListener(camera.transform.events.Update, function(transform){
-            glMatrix.mat4.multiply(that.M, transform.gameObject.camera.projectionMatrix, transform.getLocalToWorld());
+            glMatrix.mat4.multiply(that.M, transform.gameObject.camera.projectionMatrix, transform.getWorldToLocal());
             glMatrix.mat4.multiply(that.M, vP, that.M);
         });
     }
@@ -31,13 +31,13 @@ define(["./lib/Octree", "./lib/gl-matrix"], function (Quadtree, glMatrix) {
             gameObjects = camera.world.Retrieve(camera),
             //gameObjects = camera.world.gameObjects;
             gameObjectsCount = gameObjects.length;
-            
             console.log(gameObjectsCount);
-
         for (var i = 0; i < gameObjectsCount; i++) {
             var gameObject = gameObjects[i];
             
-            this.RenderAxis(gameObject);
+            if(gameObject === this.camera)continue;
+            
+            //this.RenderAxis(gameObject);
             
             if (gameObject.sprite !== undefined) {
                 this.RenderSprite(gameObject.sprite);
@@ -46,9 +46,11 @@ define(["./lib/Octree", "./lib/gl-matrix"], function (Quadtree, glMatrix) {
     }
 
     var bufferVec3 = [0,0,0];
+    var bufferMat4 = [];
 
     p.RenderSprite = function (sprite) {
-        glMatrix.vec3.transformMat4(bufferVec3, sprite.gameObject.transform.getPosition(), this.M);
+        glMatrix.vec3.transformMat4(bufferVec3, sprite.gameObject.transform.getPosition(bufferVec3), this.M);
+        
         this.context.drawImage(sprite.image, 0, 0, sprite.width, sprite.height, (bufferVec3[0] - sprite.pivot[0]) | 0, (bufferVec3[1] - sprite.pivot[1]) | 0, sprite.width, sprite.height);
     }
     
@@ -90,7 +92,7 @@ define(["./lib/Octree", "./lib/gl-matrix"], function (Quadtree, glMatrix) {
         this.context.strokeStyle = '#00ff00';
         this.context.stroke();     
 
-        //draw Y
+        //draw Z
         pos[0] = 0;
         pos[1] = 0;
         pos[2] = 100;

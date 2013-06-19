@@ -11,9 +11,6 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
         this.bufferVec3 = [0,0,0];
         this.bufferMat4 = [];
         
-        this.position = [0, 0, 0];
-        this.localPosition = [0,0,0];
-
         this.children = [];
 
         this.local = [
@@ -40,16 +37,6 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
 
     var p = Transform.prototype = Object.create(Component.prototype);
 
-    p.dirty = true;
-
-    p.position = null;
-
-    p.localPosition = null;
-
-    p.rotation = null;
-
-    p.localRotation = null;
-
     p.local = null;
 
     p.worldMatrix = null;
@@ -69,25 +56,6 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
         this.CalculateLocalMatrix();
     }
 
-    p.UpdateMatrices = function() {
-        this.UpdateLocalMatrix();
-        this.UpdateWorldMatrix();
-
-        for (var i = 0; i < this.children.length; i++) {
-            this.children[i].UpdateMatrices();
-        }
-
-        this.DispatchEvent(this.events.Update, this);
-    }
-
-    /*  p.UpdateLocalMatrix = function() {
-     
-     glMatrix.mat4.fromRotationTranslation(this.localMatrix, this.quatRotation, this.position);
-     glMatrix.mat4.scale(this.localMatrix, this.localMatrix, this.scale);
-     }
-     */
-
-
     p.translate = function(x, y, z, relativeTo) {
         var inputVec = this.bufferVec3,
                 tmpMat = this.bufferMat4;
@@ -102,8 +70,6 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
             glMatrix.mat4.multiply(this.local, tmpMat, this.local);
         }else
             glMatrix.mat4.translate(this.local, this.local, inputVec);
-
-        this.dirty = true;
 
         this.DispatchEvent(this.events.Update, this);
     }
@@ -125,22 +91,17 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
             glMatrix.mat4.rotateX(this.local, this.local, x * degreeToRad);
         }
 
-        this.dirty = true;
-
         this.DispatchEvent(this.events.Update, this);
     }
 
     p.getLocalToWorld = function() { //FIX: transformation operations doesn't apply if getLocalToWorld isn't called first.
-        if (this.dirty === true) {
             if (this.parent === null) {
                 glMatrix.mat4.copy(this.localToWorld, this.local);
             } else {
                 glMatrix.mat4.multiply(this.localToWorld, this.parent.getLocalToWorld(), this.local)
-                glMatrix.mat4.invert(this.worldToLocal, this.localToWorld);
+                
             }
-
-            this.dirty = false;
-        }
+            glMatrix.mat4.invert(this.worldToLocal, this.localToWorld);
 
         return this.localToWorld;
     }
@@ -149,20 +110,30 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
         return this.worldToLocal;
     }
 
-    p.getPosition = function() {
+    p.getPosition = function(out) {
+        if(out === undefined)
+            out = [];
+        
         var m = this.getLocalToWorld();
-        this.position[0] = m[12];
-        this.position[1] = m[13];
-        this.position[2] = m[14];
-        return this.position;
+        
+        out[0] = m[12];
+        out[1] = m[13];
+        out[2] = m[14];
+        
+        return out;
     }
 
-    p.getLocalPosition = function() {
+    p.getLocalPosition = function(out) {
+        if(out === undefined)
+            out = [];
+        
         var m = this.local;
-        this.localPosition[0] = m[12];
-        this.localPosition[1] = m[13];
-        this.localPosition[2] = m[14];
-        return this.localPosition;
+        
+        out[0] = m[12];
+        out[1] = m[13];
+        out[2] = m[14];
+        
+        return out;
     }
 
     p.getRotation = function() {
@@ -172,45 +143,6 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
     p.getLocalRotation = function() {
         throw "TransformComponent.getLocalRotation not implemented yet";
     }
-    /*
-     p.Rotate = function(x, y, z, relativeTo) {
-     var degreeToRad = Math.PI / 180;
-     
-     if (relativeTo === "world") {
-     var quat = [0, 0, 0, 1];
-     
-     scaliaEngine.utils.glMatrix.quat.rotateZ(quat, quat, z * degreeToRad);
-     scaliaEngine.utils.glMatrix.quat.rotateY(quat, quat, y * degreeToRad);
-     scaliaEngine.utils.glMatrix.quat.rotateX(quat, quat, x * degreeToRad);
-     
-     scaliaEngine.utils.glMatrix.quat.multiply(this.quatRotation, quat, this.quatRotation);
-     } else {
-     scaliaEngine.utils.glMatrix.quat.rotateZ(this.quatRotation, this.quatRotation, z * degreeToRad);
-     scaliaEngine.utils.glMatrix.quat.rotateY(this.quatRotation, this.quatRotation, y * degreeToRad);
-     scaliaEngine.utils.glMatrix.quat.rotateX(this.quatRotation, this.quatRotation, x * degreeToRad);
-     }
-     
-     this.UpdateMatrices();
-     }
-     
-     p.Translate = function(x, y, z, relativeTo) {
-     r = [x, y, z];
-     
-     if (relativeTo == "world") {
-     var tmp = glMatrix.mat4.Create();
-     glMatrix.mat4.translate(tmp, tmp, r);
-     glMatrix.mat4.multiply(this.position, tmp, this.position);
-     } else
-     glMatrix.mat4.translate(this.position, this.position, r);
-     
-     this.UpdateMatrices();
-     }
-     
-     p.Scale = function(x, y, z) {
-     glMatrix.mat4.scale(this.localMatrix, this.localMatrix, [x, y, z]);
-     
-     this.UpdateMatrices();
-     }
-     */
+   
     return Transform;
 });

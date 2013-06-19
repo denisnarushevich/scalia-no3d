@@ -11,12 +11,12 @@ define(function(){
      * @return {BoundingBox}
      */
     BoundingBox.Calculate = function(boundingBox, vertices){
-        var maxX = 0,
-            minX = 0,
-            maxY = 0,
-            minY = 0,
-            maxZ = 0,
-            minZ = 0,
+        var maxX = vertices[0][0],
+            minX = vertices[0][0],
+            maxY = vertices[0][1],
+            minY = vertices[0][1],
+            maxZ = vertices[0][2],
+            minZ = vertices[0][2],
             verticesCount = vertices.length,
             vertex, i;
         
