@@ -9,11 +9,9 @@ define(["../engine/engine"], function (scalia) {
         sprite.width = 64;
         sprite.height = 47;
         sprite.pivot = [0,24];
-        sprite.layer = 0;
 
         this.AddComponent(sprite);
 
-        this.layer = 0;
     }
 
     var p = Tile.prototype = Object.create(scalia.GameObject.prototype);

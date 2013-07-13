@@ -6,7 +6,6 @@ define(function () {
     function World(logic) {
         this.logic = logic;
         this.gameObjects = [];
-        this.layers = [];
     }
 
     var p = World.prototype;
@@ -32,17 +31,13 @@ define(function () {
      */
     p.orthogonal = true;
 
-    p.layers = null;
-
     /**
+     * Array with gameObjects
      * @param {GameObject} gameObject
      */
     p.AddGameObject = function(gameObject){
         this.gameObjects[this.gameObjectsCount++] = gameObject;
         gameObject.world = this;
-
-        this.layers[gameObject.layer] = this.layers[gameObject.layer] || [];
-        this.layers[gameObject.layer].push(gameObject);
     }
 
     p.Retrieve = function(gameObject){

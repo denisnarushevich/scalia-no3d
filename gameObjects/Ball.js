@@ -9,7 +9,6 @@ define(["../engine/engine"], function (scalia) {
         sprite.width = 32;
         sprite.height = 32;
         sprite.pivot = [16, 32];
-        sprite.layer = 1;
 
         this.AddComponent(sprite);
 
@@ -20,6 +19,8 @@ define(["../engine/engine"], function (scalia) {
 
     p.Tick = function () {
         scalia.GameObject.prototype.Tick.call(this);
+
+        this.transform.translate(Math.random()*10-5,0,Math.random()*10-5);
     }
 
     return Ball;

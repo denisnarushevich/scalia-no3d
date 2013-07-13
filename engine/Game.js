@@ -1,4 +1,4 @@
-define(["./Logic", "./Graphics", "./utils/base"], function (Logic, Graphics, utils) {
+define(["./Logic", "./Graphics"], function (Logic, Graphics) {
     /*RAF shim*/
     window.requestAnimFrame = (function () {
         return  window.requestAnimationFrame ||

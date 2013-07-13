@@ -1,18 +1,18 @@
 define([
-    './utils/base',
     './Game',
     './GameObject',
     './Component',
+    './Layers',
     './gameObjects/Camera',
     './components/CameraComponent',
     './components/TransformComponent',
     './components/SpriteComponent',
-], function (utils, Game, GameObject, Component, Camera, CameraComponent, TransformComponent, SpriteComponent) {
+], function (Game, GameObject, Component, Layers, Camera, CameraComponent, TransformComponent, SpriteComponent) {
     return window.scaliaEngine = {
-        utils: utils,
         Game: Game,
         GameObject: GameObject,
         Component: Component,
+        Layers: Layers,
         gameObjects: {
             Camera: Camera
         },

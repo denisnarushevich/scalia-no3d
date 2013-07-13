@@ -17,6 +17,12 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
     p.instanceId = 0;
 
     /**
+     * Layer index
+     * @type {int}
+     */
+    p.layer = 0;
+
+    /**
      * Reference to world object
      * @type {World}
      */
