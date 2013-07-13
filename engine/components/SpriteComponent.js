@@ -9,8 +9,9 @@ define(["../Component"], function (Component) {
 
     p.width = 0;
     p.height = 0;
+    p.layer = 0;
 
-    p.pivot = [0, 16, 0]; //TODO should be 2d array
+    p.pivot = [0, 0, 0]; //TODO should be 2d array
 
     return Sprite;
 });

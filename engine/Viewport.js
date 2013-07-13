@@ -3,16 +3,16 @@ define(["./CanvasRenderer"], function (CanvasRenderer) {
      * @param {CameraObject} camera
      * @constructor
      */
-    function Viewport(camera, size) {
+    function Viewport(camera, size, graphics) {
+        this.graphics = graphics;
         this.camera = camera;
 
         this.canvas = document.createElement("canvas");
         this.context = this.canvas.getContext("2d");
-        //this.context.translate(0.5, 0.5);
 
         this.SetSize(size);
 
-        this.renderer = new CanvasRenderer(this.canvas, camera);
+        this.renderer = new CanvasRenderer(this);
     }
 
     var p = Viewport.prototype;

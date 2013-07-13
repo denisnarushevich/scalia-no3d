@@ -9,9 +9,9 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
         this.projectionMatrix = [];
         this.size = [width, height,length];
         this.frustum = [[-width/2,-height/2,0],[width/2,height/2,length]];
-        this.bounds = BoundingBox.Create();
+        this.bounds = new BoundingBox();
         
-        glMatrix.mat4.ortho(this.projectionMatrix, -width/2,width/2,height/2,-height/2,0,length);
+        glMatrix.mat4.ortho(this.projectionMatrix, -width/2,width/2,-height/2,height/2,0,length);
         
         this.frustumUpdate();
         this.calculateBounds();
@@ -38,7 +38,7 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
     }
     
     p.calculateBounds = function(){
-        BoundingBox.Calculate(this.bounds, this.frustum);
+       this.bounds.Calculate(this.frustum);
     }
 
     return CameraComponent;

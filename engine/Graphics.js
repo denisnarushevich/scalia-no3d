@@ -20,11 +20,17 @@ define(["./Viewport"], function (Viewport) {
     p.viewports = null;
 
     /**
+     * Count of canvas layers. Each renderable component(e.g. sprite) can have assigned layer index.
+     * @type {int}
+     */
+    p.layersCount = 2;
+
+    /**
      * @param {CameraComponent} camera
      * @return {Viewport}
      */
     p.CreateViewport = function(camera, size){
-        var viewport = new Viewport(camera, size);
+        var viewport = new Viewport(camera, size, this);
         this.viewports.push(viewport);
         return viewport;
     }

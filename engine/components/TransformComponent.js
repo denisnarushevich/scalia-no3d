@@ -101,7 +101,11 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
                 glMatrix.mat4.multiply(this.localToWorld, this.parent.getLocalToWorld(), this.local)
                 
             }
-            glMatrix.mat4.invert(this.worldToLocal, this.localToWorld);
+
+            if(this.gameObject.world && this.gameObject.world.orthogonal === true)
+                glMatrix.mat4.transpose(this.worldToLocal, this.localToWorld);
+            else
+                glMatrix.mat4.invert(this.worldToLocal, this.localToWorld);
 
         return this.localToWorld;
     }

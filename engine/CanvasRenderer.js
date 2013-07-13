@@ -1,14 +1,24 @@
-define(["./lib/Octree", "./lib/gl-matrix"], function (Quadtree, glMatrix) {
-    function CanvasRenderer(canvas, camera) {
-        this.context = canvas.getContext("2d");
-        this.camera = camera;
-        this.resolution = camera.camera.size;
+define(["./lib/gl-matrix", "./Layer"], function (glMatrix, Layer) {
+    function CanvasRenderer(viewport) {
+        this.context = viewport.context;
+        this.camera = viewport.camera;
+        this.resolution = viewport.size;
 
+        this.layers = [];
+
+        //generate canvases for each layer
+        for(var i = 0; i<viewport.graphics.layersCount; i++){
+            this.layers[i] = new Layer(i, this.resolution[0], this.resolution[1]);
+        }
+
+        this.layers[0].depthSortingEnabled = false;
+
+        //viewport matrix
         var vP = [
-            this.resolution[0]/2,0,0,0,
-            0,-this.resolution[1]/2,0,0,
+            (this.resolution[0]/2)|0,0,0,0,
+            0,-(this.resolution[1]/2)|0,0,0,
             0,0,1,0,
-            this.resolution[0]/2, this.resolution[1]/2,0,1
+            (this.resolution[0]/2)|0, (this.resolution[1]/2)|0,0,1
         ];
 
         //matrix multiplication is associative, it means that we can precalculate camera matrix...
@@ -16,13 +26,17 @@ define(["./lib/Octree", "./lib/gl-matrix"], function (Quadtree, glMatrix) {
         glMatrix.mat4.multiply(this.M, vP, this.M);
         var that = this;
         //...and keep it updated each time, when camera's worldTolocal matrix changes.
-        camera.transform.AddListener(camera.transform.events.Update, function(transform){
+        this.camera.transform.AddListener(this.camera.transform.events.Update, function(transform){
             glMatrix.mat4.multiply(that.M, transform.gameObject.camera.projectionMatrix, transform.getWorldToLocal());
             glMatrix.mat4.multiply(that.M, vP, that.M);
         });
     }
 
-    var p = CanvasRenderer.prototype;
+    var p = CanvasRenderer.prototype,
+        bufferVec3 = [0,0,0],
+        apos = [],
+        bpos = [],
+        objectBuffer = [];
 
     p.Render = function () {
         this.context.clearRect(0, 0, this.resolution[0], this.resolution[1]);
@@ -31,27 +45,42 @@ define(["./lib/Octree", "./lib/gl-matrix"], function (Quadtree, glMatrix) {
             gameObjects = camera.world.Retrieve(camera),
             //gameObjects = camera.world.gameObjects;
             gameObjectsCount = gameObjects.length;
-            console.log(gameObjectsCount);
-        for (var i = 0; i < gameObjectsCount; i++) {
-            var gameObject = gameObjects[i];
-            
-            if(gameObject === this.camera)continue;
-            
-            //this.RenderAxis(gameObject);
-            
-            if (gameObject.sprite !== undefined) {
-                this.RenderSprite(gameObject.sprite);
+
+        for(var i = 0; i < this.layers.length; i++){
+            var layer = this.layers[i];
+            layer.context.clearRect(0,0,layer.canvas.width, layer.canvas.height);
+            gameObjects = camera.world.layers[i];
+            gameObjectsCount = gameObjects.length;
+
+            if(layer.depthSortingEnabled === true){
+                gameObjects.sort(function(a, b){
+                    a.transform.getPosition(apos);
+                    b.transform.getPosition(bpos);
+                    return (bpos[0] + bpos[1] + bpos[2]) - (apos[0] + apos[1] + apos[2]);
+                });
             }
+
+            for (var j = 0; j < gameObjectsCount; j++) {
+                var gameObject = gameObjects[j];
+
+                if(gameObject === this.camera)continue;
+
+                if (gameObject.sprite !== undefined) {
+                    this.RenderSprite(gameObject.sprite);
+                }
+
+                //this.RenderAxis(gameObject);
+            }
+            this.context.drawImage(this.layers[i].canvas, 0,0);
         }
     }
 
-    var bufferVec3 = [0,0,0];
-    var bufferMat4 = [];
-
+    //Rounding coordinates with Math.round is slow, but looks better
+    //Rounding to lowest with pipe operator is faster, but looks worse
     p.RenderSprite = function (sprite) {
         glMatrix.vec3.transformMat4(bufferVec3, sprite.gameObject.transform.getPosition(bufferVec3), this.M);
         
-        this.context.drawImage(sprite.image, 0, 0, sprite.width, sprite.height, (bufferVec3[0] - sprite.pivot[0]) | 0, (bufferVec3[1] - sprite.pivot[1]) | 0, sprite.width, sprite.height);
+        this.layers[sprite.layer].context.drawImage(sprite.image, 0, 0, sprite.width, sprite.height, Math.round(bufferVec3[0] - sprite.pivot[0]), Math.round(bufferVec3[1] - sprite.pivot[1]), sprite.width, sprite.height);
     }
     
     p.RenderAxis = function(gameObject){
