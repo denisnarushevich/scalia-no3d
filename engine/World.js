@@ -26,12 +26,6 @@ define(function () {
     p.gameObjectsCount = 0;
 
     /**
-     * World axes is orthogonal
-     * @type {boolean}
-     */
-    p.orthogonal = true;
-
-    /**
      * Array with gameObjects
      * @param {GameObject} gameObject
      */

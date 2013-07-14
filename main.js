@@ -38,7 +38,7 @@ require(["./engine/engine", "./gameObjects/Ball", "./gameObjects/Tile"], functio
     // 1/cos(45)*TILE_WIDTH/2 = 45.255 , where 45deg angle is rotation about Y axis.
 
     cameraObject.transform.rotate(30, 45, 0, "self");
-    cameraObject.transform.translate(0,0,0);
+    cameraObject.transform.translate(10,0,0);
 
     myGame.logic.world.AddGameObject(cameraObject);
 

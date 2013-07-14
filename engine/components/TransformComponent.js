@@ -8,9 +8,6 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
     function Transform(gameObject) {
         Component.call(this, gameObject);
 
-        this.bufferVec3 = [0,0,0];
-        this.bufferMat4 = [];
-        
         this.children = [];
 
         this.local = [
@@ -35,11 +32,13 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
         ];
     }
 
-    var p = Transform.prototype = Object.create(Component.prototype);
+    var p = Transform.prototype = Object.create(Component.prototype),
+        bufferVec3 = new Float32Array([0,0,0]),
+        bufferMat4 = new Float32Array(16);
 
     p.local = null;
 
-    p.worldMatrix = null;
+    p.localToWorld = null;
 
     p.worldToLocal = null;
  
@@ -57,8 +56,8 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
     }
 
     p.translate = function(x, y, z, relativeTo) {
-        var inputVec = this.bufferVec3,
-                tmpMat = this.bufferMat4;
+        var inputVec = bufferVec3,
+                tmpMat = bufferMat4;
         
         inputVec[0] = x;
         inputVec[1] = y;
@@ -94,7 +93,7 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
         this.DispatchEvent(this.events.Update, this);
     }
 
-    p.getLocalToWorld = function() { //FIX: transformation operations doesn't apply if getLocalToWorld isn't called first.
+    p.getLocalToWorld = function() {
             if (this.parent === null) {
                 glMatrix.mat4.copy(this.localToWorld, this.local);
             } else {
@@ -102,10 +101,7 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
                 
             }
 
-            if(this.gameObject.world && this.gameObject.world.orthogonal === true)
-                glMatrix.mat4.transpose(this.worldToLocal, this.localToWorld);
-            else
-                glMatrix.mat4.invert(this.worldToLocal, this.localToWorld);
+            glMatrix.mat4.invert(this.worldToLocal, this.localToWorld);
 
         return this.localToWorld;
     }
