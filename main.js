@@ -4,15 +4,16 @@ require(["./engine/engine", "./gameObjects/Ball", "./gameObjects/Tile"], functio
 
     myGame = new scaliaEngine.Game();
 
-    for (var i = -20; i < 20; i++) {
-        for (var j = -20; j < 20; j++) {
+
+    for (var i = -32; i < 32; i++) {
+        for (var j = -32; j < 32; j++) {
             var tile = new Tile();
             tile.transform.translate(i*45.255, 0, j*45.255);
             myGame.logic.world.AddGameObject(tile);
         }
     }
 
-    for(var j = 0; j<1000;j++){
+    for(var j = 0; j<2000;j++){
         var ball = new Ball();
         myGame.logic.world.AddGameObject(ball);
         ball.transform.translate(Math.random()*2000-1000, 0,Math.random()*2000-1000, "world");

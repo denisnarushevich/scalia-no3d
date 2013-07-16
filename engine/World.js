@@ -35,7 +35,7 @@ define(function () {
     }
 
     p.Retrieve = function(gameObject){
-        return this.gameObjects;
+        return this.gameObjects.slice(0);
     }
 
     p.Tick = function(){

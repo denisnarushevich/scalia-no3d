@@ -8,7 +8,7 @@ define(["../engine/engine"], function (scalia) {
         sprite.image.src = "tile2.png";
         sprite.width = 64;
         sprite.height = 47;
-        sprite.pivot = [0,24];
+        sprite.pivot = [32,24];
 
         this.AddComponent(sprite);
 
