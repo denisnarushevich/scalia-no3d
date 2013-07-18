@@ -1,5 +1,5 @@
-require(["./engine/engine", "./gameObjects/Ball", "./gameObjects/Tile"], function (scaliaEngine, Ball, Tile) {
-    scaliaEngine.Layers.AddLayer();
+require(["./Isometrica" ,"./engine/engine", "./gameObjects/Ball", "./gameObjects/Tile"], function (Isometrica, scaliaEngine, Ball, Tile) {
+/*    scaliaEngine.Layers.AddLayer();
     scaliaEngine.Layers.layers[0].depthSortingEnabled = false;
 
     myGame = new scaliaEngine.Game();
@@ -48,5 +48,7 @@ require(["./engine/engine", "./gameObjects/Ball", "./gameObjects/Tile"], functio
     var viewport = myGame.graphics.CreateViewport(cameraObject, size);
     document.body.appendChild(viewport.canvas);
 
-    myGame.Run();
+    myGame.Run();*/
+
+   window.isometrica = new Isometrica();
 });

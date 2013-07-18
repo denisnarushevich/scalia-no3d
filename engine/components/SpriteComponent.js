@@ -5,7 +5,7 @@ define(["../Component"], function (Component) {
 
     var p = Sprite.prototype = Object.create(Component.prototype);
 
-    p.image = null;
+    p.image = new Image();
 
     p.width = 0;
     p.height = 0;

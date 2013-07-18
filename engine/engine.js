@@ -7,8 +7,9 @@ define([
     './components/CameraComponent',
     './components/TransformComponent',
     './components/SpriteComponent',
-    './lib/gl-matrix'
-], function (Game, GameObject, Component, Layers, Camera, CameraComponent, TransformComponent, SpriteComponent, glMatrix) {
+    './lib/gl-matrix',
+    './AssetManager'
+], function (Game, GameObject, Component, Layers, Camera, CameraComponent, TransformComponent, SpriteComponent, glMatrix, AssetManager) {
     return window.scaliaEngine = {
         Game: Game,
         GameObject: GameObject,
@@ -22,6 +23,7 @@ define([
             TransformComponent: TransformComponent,
             SpriteComponent: SpriteComponent
         },
-        gl: glMatrix
+        gl: glMatrix,
+        Assets: AssetManager
     };
 });

@@ -23,8 +23,8 @@ define(["./Viewport"], function (Viewport) {
      * @param {CameraComponent} camera
      * @return {Viewport}
      */
-    p.CreateViewport = function(camera, size){
-        var viewport = new Viewport(camera, size, this);
+    p.CreateViewport = function(camera, width, height){
+        var viewport = new Viewport(camera, width, height, this);
         this.viewports.push(viewport);
         return viewport;
     }

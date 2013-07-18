@@ -65,9 +65,19 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
         }
 
         this.components[this.componentsCount++] = component;
+        component.gameObject = this;
+    }
+
+    p.getComponent = function(Type){
+        for(var i = 0; i < this.components.length; i++){
+            var component = this.components[i];
+            if(component instanceof Type)
+                return component;
+        }
     }
 
     p.Tick = function(){
+        //console.log(this)
         for(var i = 0; i < this.componentsCount; i++){
             this.components[i].Tick();
         }
