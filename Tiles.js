@@ -3,14 +3,14 @@ define(['./gameObjects/Tile', './components/TileComponent'], function(Tile, Tile
         this.tiles = [];
 
         var tile;
-        var n = 200;
+        var n = 192;
         for(var i = 0; i < n*n; i++){
             tile = new Tile();
             this.tiles.push(tile);
             var x = (i/n)|0;
             var y = i-x*n;
             tile.transform.translate(x*45.255, 0, y*45.255);
-            isometrica.game.logic.world.AddGameObject(tile);
+            isometrica.game.logic.world.addGameObject(tile);
 
             var t = tile.getComponent(TileComponent);
             t.x = x;

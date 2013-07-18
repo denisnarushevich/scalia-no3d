@@ -17,7 +17,7 @@ define(['./Time', './World'], function (Time, World) {
     p.game = null;
 
     /**
-     * Holds state of the game (scene graph, BSP tree)
+     * The scene
      * @type {null}
      */
     p.world = null;
@@ -35,12 +35,12 @@ define(['./Time', './World'], function (Time, World) {
         var frameTime = now - this.time.now,
             dt = this.time.dt;
 
-        while(frameTime >= dt && i < 5){
+        while(frameTime >= dt){
             i++;
             frameTime -= dt;
             this.time.now += dt;
             this.time.time += dt;
-            this.world.Tick();
+            this.world.tick();
         }
     }
 

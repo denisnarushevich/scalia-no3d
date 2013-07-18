@@ -6,7 +6,7 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
     function GameObject() {
         this.instanceId = GameObject.prototype.instanceId++;
         this.components = [];
-        this.AddComponent(new Transform(this));
+        this.addComponent(new Transform(this));
     }
 
     var p = GameObject.prototype;
@@ -24,6 +24,7 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
 
     /**
      * Reference to world object
+     * @private
      * @type {World}
      */
     p.world = null;
@@ -51,11 +52,24 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
     p.componentsCount = 0;
 
     /**
+     * @param {World} world
+     */
+    p.setWorld = function(world){
+        this.world = world;
+
+
+
+        for(var i = 0; i < this.componentsCount; i++){
+            this.components[i].start();
+        }
+    }
+
+    /**
      * @public
      * @param {Component} component
      * @return {*}
      */
-    p.AddComponent = function(component){
+    p.addComponent = function(component){
         if(component instanceof Transform){
             this.transform = component;
         }else if(component instanceof Camera){
@@ -65,6 +79,7 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
         }
 
         this.components[this.componentsCount++] = component;
+
         component.gameObject = this;
     }
 
@@ -76,10 +91,10 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
         }
     }
 
-    p.Tick = function(){
+    p.tick = function(){
         //console.log(this)
         for(var i = 0; i < this.componentsCount; i++){
-            this.components[i].Tick();
+            this.components[i].tick();
         }
     }
 

@@ -46,7 +46,7 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
         this.context.clearRect(0, 0, this.resolution[0], this.resolution[1]);
 
         var camera = this.camera,
-            gameObjects = camera.world.Retrieve(camera),
+            gameObjects = camera.world.retrieve(camera),
             gameObjectsCount = gameObjects.length,
             gameObject, i, j;
 

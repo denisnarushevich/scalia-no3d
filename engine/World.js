@@ -29,18 +29,18 @@ define(function () {
      * Array with gameObjects
      * @param {GameObject} gameObject
      */
-    p.AddGameObject = function(gameObject){
+    p.addGameObject = function(gameObject){
         this.gameObjects[this.gameObjectsCount++] = gameObject;
-        gameObject.world = this;
+        gameObject.setWorld(this);
     }
 
-    p.Retrieve = function(gameObject){
+    p.retrieve = function(gameObject){
         return this.gameObjects.slice(0);
     }
 
-    p.Tick = function(){
+    p.tick = function(){
         for(var i = 0; i < this.gameObjectsCount; i++){
-            this.gameObjects[i].Tick();
+            this.gameObjects[i].tick();
         }
     }
 

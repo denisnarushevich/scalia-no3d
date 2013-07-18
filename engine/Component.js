@@ -17,7 +17,11 @@ define(["./EventManager"], function (EventManager) {
      */
     p.gameObject = null;
 
-    p.Tick = function(){
+    p.start = function(){
+
+    }
+
+    p.tick = function(){
 
     }
 

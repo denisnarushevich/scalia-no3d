@@ -17,7 +17,7 @@ define(['./engine/engine', './Tiles', './components/CameraControls', './gameObje
 
 
         var isometrica = this;
-        Scalia.Assets.loadBatch(['./tile.png', './tile2.png', 'green-ball-small.png'], function () {
+        Scalia.Assets.loadBatch(['./tile.png', './tile2.png', './green-ball-small.png'], function () {
                 console.log('starting');
                 isometrica.start();
             },
@@ -31,15 +31,15 @@ define(['./engine/engine', './Tiles', './components/CameraControls', './gameObje
         this.tiles = new Tiles(this);
         //TODO actually, camera should be initialized in gameView.
         var cameraObject = this.camera = new scaliaEngine.gameObjects.Camera(document.width, document.height, 100);
-        cameraObject.AddComponent(new CC());
+        cameraObject.addComponent(new CC());
         cameraObject.transform.rotate(30, 45, 0, "self");
-        this.game.logic.world.AddGameObject(cameraObject);
+        this.game.logic.world.addGameObject(cameraObject);
 
 
-        for(var i = 0; i<1000; i++){
+        for(var i = 0; i<5000; i++){
             var ball = new Ball();
             ball.transform.translate(Math.random()*4000, 0,Math.random()*4000, "world");
-            this.game.logic.world.AddGameObject(ball);
+            this.game.logic.world.addGameObject(ball);
         }
 
         var viewport = this.game.graphics.CreateViewport(cameraObject, document.width, document.height);
