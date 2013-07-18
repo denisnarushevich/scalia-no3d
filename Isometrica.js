@@ -17,7 +17,7 @@ define(['./engine/engine', './Tiles', './components/CameraControls'], function (
 
 
         var isometrica = this;
-        Scalia.Assets.loadBatch(['tile.png', 'tile2.png', 'green-ball-small.png'], function () {
+        Scalia.Assets.loadBatch(['./tile.png', './tile2.png', 'green-ball-small.png'], function () {
                 console.log('starting');
                 isometrica.start();
             },

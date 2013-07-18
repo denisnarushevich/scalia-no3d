@@ -3,7 +3,7 @@ define(['./gameObjects/Tile', './components/TileComponent'], function(Tile, Tile
         this.tiles = [];
 
         var tile;
-        var n = 32;
+        var n = 200;
         for(var i = 0; i < n*n; i++){
             tile = new Tile();
             this.tiles.push(tile);
