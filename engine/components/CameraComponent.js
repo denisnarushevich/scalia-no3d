@@ -41,6 +41,10 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
        this.bounds.Calculate(this.frustum);
     }
 
+    p.setViewport = function(viewport){
+        this.viewport = viewport;
+    }
+
     return CameraComponent;
 });
 

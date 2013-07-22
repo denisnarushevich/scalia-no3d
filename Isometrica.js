@@ -28,11 +28,21 @@ define(['./engine/engine', './Tiles', './components/CameraControls', './gameObje
     }
 
     Isometrica.prototype.start = function () {
+        //Game's bootstrap is following:
+        //1.position camera on right coordinates
+        //2.initialize & show generated terrain
+        //3.fill terrain with generated trees
+        //4.load terrain data for tiles around camera position
+        //5.fill terrain with that data (buildings)
+        //*onmousemove start over from #1
+
+
         this.tiles = new Tiles(this);
         //TODO actually, camera should be initialized in gameView.
         var cameraObject = this.camera = new scaliaEngine.gameObjects.Camera(document.width, document.height, 100);
         cameraObject.addComponent(new CC());
         cameraObject.transform.rotate(30, 45, 0, "self");
+        cameraObject.transform.translate(2000,0,2000,'world');
         this.game.logic.world.addGameObject(cameraObject);
 
 
