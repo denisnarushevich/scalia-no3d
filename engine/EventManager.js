@@ -11,7 +11,7 @@ define(function () {
 
     p.eventListeners = null;
 
-    p.AddListener = function (event, callback) {
+    p.addEventListener = function (event, callback) {
         var listeners = this.eventListeners[event];
 
         if (listeners)
@@ -22,7 +22,7 @@ define(function () {
         this.eventListeners[event] = listeners;
     }
 
-    p.DispatchEvent = function (event, sender) {
+    p.dispatchEvent = function (event, sender) {
         var listeners = this.eventListeners[event],
             listenersCount = listeners === undefined ? 0 : listeners.length;
 
@@ -33,7 +33,7 @@ define(function () {
             listeners[i](sender);
     }
 
-    p.RemoveListener = function(event, callback){
+    p.removeListener = function(event, callback){
         throw "EventManager.RemoveListener: not implemented";
     }
 

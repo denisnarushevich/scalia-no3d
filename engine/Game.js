@@ -35,6 +35,8 @@ define(["./Logic", "./Graphics"], function (Logic, Graphics) {
      * @type {void}
      */
     p.Run = function () {
+        this.logic.start();
+        this.graphics.start();
         this.MainLoop();
     }
 

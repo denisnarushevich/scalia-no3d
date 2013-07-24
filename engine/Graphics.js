@@ -20,6 +20,14 @@ define(["./Viewport", "./CanvasRenderer"], function (Viewport, CanvasRenderer) {
      */
     p.viewports = null;
 
+    p.start = function(){
+        var viewports = this.viewports,
+            viewportsCount = viewports.length;
+        for(var i = 0; i < viewportsCount; i++){
+            viewports[i].start();
+        }
+    }
+
     /**
      * @param {CameraComponent} camera
      * @return {Viewport}

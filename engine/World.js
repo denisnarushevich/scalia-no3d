@@ -38,6 +38,11 @@ define(function () {
         return this.gameObjects.slice(0);
     }
 
+    p.start = function(){
+        for(var i = 0; i < this.gameObjectsCount; i++)
+            this.gameObjects[i].start();
+    }
+
     p.tick = function(){
         for(var i = 0; i < this.gameObjectsCount; i++){
             this.gameObjects[i].tick();

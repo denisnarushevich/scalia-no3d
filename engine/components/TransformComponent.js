@@ -70,7 +70,7 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
         }else
             glMatrix.mat4.translate(this.local, this.local, inputVec);
 
-        this.DispatchEvent(this.events.Update, this);
+        this.dispatchEvent(this.events.Update, this);
     }
 
     p.rotate = function(x, y, z, relativeTo) {
@@ -90,7 +90,7 @@ define(["../Component", "../lib/gl-matrix"], function(Component, glMatrix) {
             glMatrix.mat4.rotateX(this.local, this.local, x * degreeToRad);
         }
 
-        this.DispatchEvent(this.events.Update, this);
+        this.dispatchEvent(this.events.Update, this);
     }
 
     p.getLocalToWorld = function() {

@@ -27,6 +27,10 @@ define(['./Time', './World'], function (Time, World) {
      */
     p.time = null;
 
+    p.start = function(){
+        this.world.start();
+    }
+
     /**
      * @return {void}
      */

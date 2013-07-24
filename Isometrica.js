@@ -52,11 +52,14 @@ define(['./engine/engine', './Tiles', './components/CameraControls', './gameObje
             this.game.logic.world.addGameObject(ball);
         }
 
+        this.game.Run();
+
         var viewport = this.game.graphics.CreateViewport();
         viewport.setCamera(cameraObject);
         document.body.appendChild(viewport.canvas);
+        viewport.setSize(viewport.canvas.offsetWidth, viewport.canvas.offsetHeight);
 
-        this.game.Run();
+
     }
 
     /**

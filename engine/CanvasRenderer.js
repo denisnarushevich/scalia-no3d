@@ -18,8 +18,11 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
             gameObject, i, j, layer, ctx;
 
         //matrix multiplication is associative, it means that we can precalculate camera matrix...
-        glMatrix.mat4.multiply(this.pM, camera.camera.projectionMatrix, camera.transform.getWorldToLocal());
-        glMatrix.mat4.multiply(this.M, viewport.viewportMatrix, this.pM);
+        //glMatrix.mat4.multiply(this.pM, camera.camera.projectionMatrix, camera.transform.getWorldToLocal());
+        //glMatrix.mat4.multiply(this.M, viewport.viewportMatrix, this.pM);
+        this.pM = camera.camera.getWorldToViewport()
+        this.M = camera.camera.getWorldToScreen()
+
 
 
         viewport.context.clearRect(0, 0, viewport.size[0], viewport.size[1]);

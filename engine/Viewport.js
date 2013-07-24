@@ -4,15 +4,16 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
      * @constructor
      */
     function Viewport(graphics) {
+        EventManager.call(this);
+        this.events = {
+            update: 0,
+            resize: 1
+        }
+
         this.canvas = document.createElement('canvas');
         this.context = this.canvas.getContext("2d");
         this.graphics = graphics;
-        this.eventmgr = new EventManager();
-        this.size = [];
-
-        this.eventmgr.events = {
-            update: 0
-        }
+        this.size = [0,0];
 
         this.viewportMatrix = new Float32Array(16);
 
@@ -23,11 +24,13 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
             this.layers[i] = cnv.getContext("2d");
         }
 
-
-
+        var viewport = this;
+        window.addEventListener('resize', function(){
+            viewport.setSize(viewport.canvas.offsetWidth, viewport.canvas.offsetHeight);
+        });
     }
 
-    var p = Viewport.prototype;
+    var p = Viewport.prototype = Object.create(EventManager.prototype);
 
     /**
      * @type {int[]}
@@ -55,19 +58,14 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
      */
     p.context = null;
 
-    /**
-     * EventManager instance
-     * @type {EventManager}
-     */
-    p.eventmgr = null;
+    p.start = function(){
+        this.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
+    }
 
     /**
      * @return {*}
      */
     p.render = function () {
-        if(this.canvas.offsetWidth !== this.size[0] || this.canvas.offsetHeight !== this.size[1])
-            this.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
-
         if(this.camera !== null)
             this.graphics.renderer.Render(this.camera, this);
     }
@@ -96,10 +94,11 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
             ctx.canvas.height = height;
         }
 
-        this.eventmgr.DispatchEvent(this.eventmgr.events.update, this);
+        this.dispatchEvent(this.events.resize, this);
     }
 
     p.setCamera = function(camera){
+        //this.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);//kostql
         this.camera = camera;
         this.camera.camera.setViewport(this);
     }

@@ -18,6 +18,10 @@ define(["./EventManager"], function (EventManager) {
         this.gameObject = gameObject;
     }
 
+    p.awake = function(){
+
+    }
+
     p.start = function(){
 
     }

@@ -51,6 +51,12 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
      */
     p.componentsCount = 0;
 
+    p.start = function(){
+        for(var i = 0; i < this.componentsCount; i++){
+            this.components[i].start();
+        }
+    }
+
     /**
      * @param {World} world
      */
@@ -60,7 +66,7 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
 
 
         for(var i = 0; i < this.componentsCount; i++){
-            this.components[i].start();
+            this.components[i].awake();
         }
     }
 
