@@ -24,8 +24,11 @@ define(['../engine/engine'], function(scalia){
                 var a = [];
                 //scalia.gl.vec2.transformMat4(a, [x,y],cc.gameObject.transform.localToWorld);
 
-                cc.gameObject.transform.translate(-x,y,0); //look fine, but it raises camera(by Y axris), instead of moving it by Z axis.
+                //cc.gameObject.transform.translate(-x,0,0); //look fine, but it raises camera(by Y axris), instead of moving it by Z axis.
+                //cc.gameObject.transform.translate(y*1/Math.cos(45*Math.PI/180),0,y*1/Math.cos(45*Math.PI/180),'world');
                 //cc.gameObject.transform.translate(-x+y,0,x+y, 'world');
+                cc.gameObject.transform.translate(y*1/Math.cos(45*Math.PI/180)-x*Math.cos(45*Math.PI/180),0,x*Math.cos(45*Math.PI/180)+y*1/Math.cos(45*Math.PI/180),'world');
+
             }
         }
 
