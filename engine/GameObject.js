@@ -80,7 +80,7 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
 
         this.components[this.componentsCount++] = component;
 
-        component.gameObject = this;
+        component.setGameObject(this);
     }
 
     p.getComponent = function(Type){

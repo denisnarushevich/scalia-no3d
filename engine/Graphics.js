@@ -1,10 +1,11 @@
-define(["./Viewport"], function (Viewport) {
+define(["./Viewport", "./CanvasRenderer"], function (Viewport, CanvasRenderer) {
     /**
      * @constructor
      */
     function Graphics(game) {
         this.game = game;
         this.viewports = [];
+        this.renderer = new CanvasRenderer();
     }
 
     var p = Graphics.prototype;
@@ -23,8 +24,8 @@ define(["./Viewport"], function (Viewport) {
      * @param {CameraComponent} camera
      * @return {Viewport}
      */
-    p.CreateViewport = function(camera, width, height){
-        var viewport = new Viewport(camera, width, height, this);
+    p.CreateViewport = function(){
+        var viewport = new Viewport(this);
         this.viewports.push(viewport);
         return viewport;
     }
@@ -36,7 +37,7 @@ define(["./Viewport"], function (Viewport) {
         var viewports = this.viewports,
             viewportsCount = viewports.length;
         for(var i = 0; i < viewportsCount; i++){
-            viewports[i].Render();
+            viewports[i].render();
         }
     }
 

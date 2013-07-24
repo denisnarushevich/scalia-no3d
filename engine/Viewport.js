@@ -1,25 +1,30 @@
-define(["./CanvasRenderer"], function (CanvasRenderer) {
+define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRenderer, EventManager, Layers) {
     /**
      * @param {CameraObject} camera
      * @constructor
      */
-    function Viewport(camera, width, height, graphics) {
-        this.graphics = graphics;
-        this.camera = camera;
-
-        this.viewportMatrix = new Float32Array([
-            (width / 2) | 0, 0, 0, 0,
-            0, -(height / 2) | 0, 0, 0,
-            0, 0, 1, 0,
-            (width / 2) | 0, (height / 2) | 0, 0, 1
-        ]);;
-
-        this.canvas = document.createElement("canvas");
+    function Viewport(graphics) {
+        this.canvas = document.createElement('canvas');
         this.context = this.canvas.getContext("2d");
+        this.graphics = graphics;
+        this.eventmgr = new EventManager();
+        this.size = [];
 
-        this.SetSize([width, height]);
+        this.eventmgr.events = {
+            update: 0
+        }
 
-        this.renderer = new CanvasRenderer(this);
+        this.viewportMatrix = new Float32Array(16);
+
+        //generate layers
+        this.layers = [];
+        for (var i = 0; i < Layers.layers.length; i++) {
+            var cnv = document.createElement("canvas");
+            this.layers[i] = cnv.getContext("2d");
+        }
+
+
+
     }
 
     var p = Viewport.prototype;
@@ -51,27 +56,52 @@ define(["./CanvasRenderer"], function (CanvasRenderer) {
     p.context = null;
 
     /**
+     * EventManager instance
+     * @type {EventManager}
+     */
+    p.eventmgr = null;
+
+    /**
      * @return {*}
      */
-    p.Render = function () {
-        this.renderer.Render();
+    p.render = function () {
+        if(this.canvas.offsetWidth !== this.size[0] || this.canvas.offsetHeight !== this.size[1])
+            this.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
+
+        if(this.camera !== null)
+            this.graphics.renderer.Render(this.camera, this);
     }
 
     /**
      * @param {int[]} size Vector2. Size of the viewport
      * @constructor
      */
-    p.SetSize = function (size) {
-        this.size = size;
+    p.setSize = function (width, height) {
+        this.size[0] = width;
+        this.size[1] = height;
 
-        this.canvas.width = size[0];
-        this.canvas.height = size[1];
+        this.canvas.width = width;
+        this.canvas.height = height;
 
         //update viewport matrix
-        this.viewportMatrix[0] = (size[0]/2)|0;
-        this.viewportMatrix[5] = -(size[1]/2)|0;
-        this.viewportMatrix[12] = (size[0]/2)|0;
-        this.viewportMatrix[13] = (size[1]/2)|0;
+        this.viewportMatrix[0] = (width/2)|0;
+        this.viewportMatrix[5] = -(height/2)|0;
+        this.viewportMatrix[12] = (width/2)|0;
+        this.viewportMatrix[13] = (height/2)|0;
+
+        //update layer sizes
+        for (var i = 0; i < this.layers.length; i++) {
+            var ctx = this.layers[i];
+            ctx.canvas.width = width;
+            ctx.canvas.height = height;
+        }
+
+        this.eventmgr.DispatchEvent(this.eventmgr.events.update, this);
+    }
+
+    p.setCamera = function(camera){
+        this.camera = camera;
+        this.camera.camera.setViewport(this);
     }
 
     return Viewport;

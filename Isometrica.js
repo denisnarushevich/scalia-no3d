@@ -39,7 +39,7 @@ define(['./engine/engine', './Tiles', './components/CameraControls', './gameObje
 
         this.tiles = new Tiles(this);
         //TODO actually, camera should be initialized in gameView.
-        var cameraObject = this.camera = new scaliaEngine.gameObjects.Camera(document.width, document.height, 100);
+        cameraObject = this.camera = new scaliaEngine.gameObjects.Camera(document.width, document.height, 100);
         cameraObject.addComponent(new CC());
         cameraObject.transform.rotate(30, 45, 0, "self");
         cameraObject.transform.translate(2000,0,2000,'world');
@@ -52,7 +52,8 @@ define(['./engine/engine', './Tiles', './components/CameraControls', './gameObje
             this.game.logic.world.addGameObject(ball);
         }
 
-        var viewport = this.game.graphics.CreateViewport(cameraObject, document.width, document.height);
+        var viewport = this.game.graphics.CreateViewport();
+        viewport.setCamera(cameraObject);
         document.body.appendChild(viewport.canvas);
 
         this.game.Run();

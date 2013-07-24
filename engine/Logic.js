@@ -35,7 +35,7 @@ define(['./Time', './World'], function (Time, World) {
         var frameTime = now - this.time.now,
             dt = this.time.dt;
 
-        while(frameTime >= dt){
+        while(frameTime >= dt && i < 5){
             i++;
             frameTime -= dt;
             this.time.now += dt;

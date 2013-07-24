@@ -1,72 +1,49 @@
 define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
-    function CanvasRenderer(viewport) {
-        this.viewport = viewport;
-        this.context = viewport.context;
-        this.camera = viewport.camera;
-        this.resolution = viewport.size;
-        this.layersCount = Layers.layers.length;
-
-        this.layerCanvases = [];
+    function CanvasRenderer() {
         this.layerBuffers = [];
-
-        //generate canvases for each layer
-        for (var i = 0; i < this.layersCount; i++) {
-            var cnv = document.createElement("canvas");
-            cnv.width = this.resolution[0];
-            cnv.height = this.resolution[1];
-            this.layerCanvases[i] = cnv.getContext("2d");
-        }
-
-        //viewport matrix
-        var vP = viewport.viewportMatrix;
-
+        for (i = 0; i < Layers.layers.length; i++)
+            this.layerBuffers[i] = [];
         this.pM = [];
         this.M = [];
-
-        //matrix multiplication is associative, it means that we can precalculate camera matrix...
-        glMatrix.mat4.multiply(this.pM, this.camera.camera.projectionMatrix, this.camera.transform.getWorldToLocal());
-        glMatrix.mat4.multiply(this.M, vP, this.pM);
-        var that = this;
-        //...and keep it updated each time, when camera's worldTolocal matrix changes.
-        this.camera.transform.AddListener(this.camera.transform.events.Update, function (transform) {
-            glMatrix.mat4.multiply(that.pM, transform.gameObject.camera.projectionMatrix, transform.getWorldToLocal());
-            glMatrix.mat4.multiply(that.M, vP, that.pM);
-        });
     }
 
     var p = CanvasRenderer.prototype,
-        bufferVec3 = new Float32Array([0, 0, 0]);
+        bufferVec3 = new Float32Array([0, 0, 0]),
+        bufferMat4 = new Float32Array(16);
 
-    p.Render = function () {
-        this.context.clearRect(0, 0, this.resolution[0], this.resolution[1]);
-
-        var camera = this.camera,
-            gameObjects = camera.world.retrieve(camera),
+    p.Render = function (camera, viewport) {
+        var gameObjects = camera.world.retrieve(camera),
             gameObjectsCount = gameObjects.length,
-            gameObject, i, j;
+            layersCount = viewport.layers.length,
+            gameObject, i, j, layer, ctx;
 
-        for (i = 0; i < this.layersCount; i++) {
-            this.layerBuffers[i] = [];
-        }
+        //matrix multiplication is associative, it means that we can precalculate camera matrix...
+        glMatrix.mat4.multiply(this.pM, camera.camera.projectionMatrix, camera.transform.getWorldToLocal());
+        glMatrix.mat4.multiply(this.M, viewport.viewportMatrix, this.pM);
+
+
+        viewport.context.clearRect(0, 0, viewport.size[0], viewport.size[1]);
+
+
 
         for (i = 0; i < gameObjectsCount; i++) {
             gameObject = gameObjects[i];
 
-            if(gameObject === this.camera)
+            if (gameObject === this.camera)
                 continue;
 
             //primitive clipspace culling
             gameObject.transform.getPosition(bufferVec3);
             glMatrix.vec3.transformMat4(bufferVec3, bufferVec3, this.pM);
-            if(Math.abs(bufferVec3[0]) > 1 || Math.abs(bufferVec3[1]) > 1)
+            if (Math.abs(bufferVec3[0]) > 1 || Math.abs(bufferVec3[1]) > 1)
                 continue;
 
             this.layerBuffers[gameObject.layer].push(gameObject);
         }
 
-        for (i = 0; i < this.layersCount; i++) {
-            var ctx = this.layerCanvases[i],
-                layer = Layers.layers[i];
+        for (i = 0; i < layersCount; i++) {
+            layer = Layers.layers[i];
+            ctx = viewport.layers[i];
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             gameObjects = this.layerBuffers[i];
             gameObjectsCount = gameObjects.length;
@@ -82,7 +59,7 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
             }
 
             for (j = 0; j < gameObjectsCount; j++) {
-                gameObject = gameObjects[j];
+                gameObject = gameObjects.pop();
 
                 if (gameObject === this.camera)continue;
 
@@ -93,7 +70,7 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
                 //this.RenderAxis(gameObject);
             }
 
-            this.context.drawImage(ctx.canvas, 0, 0);
+            viewport.context.drawImage(ctx.canvas, 0, 0);
         }
     }
 
