@@ -68,13 +68,15 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
         var cam = this;
 
         gameObject.transform.addEventListener(gameObject.transform.events.Update, function(){
-            //update wTv mat
-            glMatrix.mat4.mul(cam.worldToViewportMatrix, cam.projectionMatrix, cam.gameObject.transform.getWorldToLocal());
+            console.log(123);
 
             //update frustumbox
             var localToWorld = cam.gameObject.transform.getLocalToWorld();
             glMatrix.vec3.transformMat4(cam.frustumBox[0], cam.frustumSize[0], localToWorld);
             glMatrix.vec3.transformMat4(cam.frustumBox[1], cam.frustumSize[1], localToWorld);
+
+            //update wTv mat
+            glMatrix.mat4.mul(cam.worldToViewportMatrix, cam.projectionMatrix, cam.gameObject.transform.getWorldToLocal());
 
             //update obbox
             cam.bounds.Calculate(cam.frustumBox);

@@ -33,8 +33,8 @@ define(function () {
             listeners[i](sender);
     }
 
-    p.removeListener = function(event, callback){
-        throw "EventManager.RemoveListener: not implemented";
+    p.removeEventListener = function(event, callback){
+        this.eventListeners.splice(this.eventListeners.indexOf(callback), 1);
     }
 
     return EventManager;
