@@ -38,9 +38,25 @@
             background: #ddd;
             z-index: 1;
         }
+
+        #vp {
+            position: absolute;
+            width: 320px;
+            height: 240px;
+            right: 10%;
+            top: 50%;
+            background-color: darkseagreen;
+            z-index: 3;
+            border: 2px solid brown;
+        }
+
+
     </style>
 </head>
 <body>
 <div id="debug"></div>
+<div id="vp">
+    <canvas id="vpcnv"></canvas>
+</div>
 </body>
 </html>

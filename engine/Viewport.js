@@ -1,16 +1,17 @@
 define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRenderer, EventManager, Layers) {
     /**
-     * @param {CameraObject} camera
+     * @param {Graphics} graphics
+     * @param {HTMLCanvasElement} canvas @optional
      * @constructor
      */
-    function Viewport(graphics) {
+    function Viewport(graphics, canvas) {
         EventManager.call(this);
         this.events = {
             update: 0,
             resize: 1
         }
 
-        this.canvas = document.createElement('canvas');
+        this.canvas = canvas || document.createElement('canvas');
         this.context = this.canvas.getContext("2d");
         this.graphics = graphics;
         this.size = [0,0];
@@ -95,12 +96,16 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
         }
 
         this.dispatchEvent(this.events.resize, this);
+
+        return this;
     }
 
     p.setCamera = function(camera){
         //this.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);//kostql
         this.camera = camera;
         this.camera.camera.setViewport(this);
+
+        return this;
     }
 
     return Viewport;

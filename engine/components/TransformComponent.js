@@ -145,7 +145,6 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
     }
 
     p.setPosition = function (x, y, z) {
-        console.log(this.local);
 
         bufferVec3[0] = x;
         bufferVec3[1] = y;
@@ -160,7 +159,6 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
         this.local[13] = bufferVec3[1];
         this.local[14] = bufferVec3[2];
 
-        console.log(this.local);
 
         this.dispatchEvent(this.events.Update, this);
     }

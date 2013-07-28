@@ -4,6 +4,7 @@ define(['../engine/engine'], function (scalia) {
 
         document.onmousedown = function (e) {
             pos = [e.pageX, e.pageY];
+            cc.removeTarget();
         }
 
         document.onmouseup = function (e) {
@@ -27,45 +28,57 @@ define(['../engine/engine'], function (scalia) {
                 );
             }
         }
+
+
     }
 
     CameraScript.prototype = Object.create(scalia.Component.prototype);
-
-    CameraScript.prototype.onTargetUpdate = function(transform){
-        console.log(this);
-        this.moveTo(transform);
-    }
 
     /**
      * @type {Transform}
      */
     CameraScript.prototype.target = null;
 
+    CameraScript.prototype.awake = function(){
+
+        this.gameObject.transform.rotate(30, 45, 0, "self");
+        this.gameObject.transform.translate(2000,0,2000,'world');
+    }
+
     /**
      * @param {Transform} target
      */
-    CameraScript.prototype.setTarget = function(target){
-        var targetTransform = target.gameObject.transform;
+    CameraScript.prototype.setTarget = function (target) {
+        if (this.target !== null) {
+            this.removeTarget();
+        } else {
+            var targetTransform = target.gameObject.transform;
 
-        this.target = target;
+            this.target = target;
 
-        this.onTargetUpdate = this.onTargetUpdate.bind(this);
+            var cameraScript = this;
+            this.onTargetUpdate = function (transform) {
+                cameraScript.moveTo(transform);
+            }
 
-        targetTransform.addEventListener(targetTransform.events.Update, this.onTargetUpdate);
+            targetTransform.addEventListener(targetTransform.events.Update, this.onTargetUpdate);
+        }
     }
 
-    CameraScript.prototype.removeTarget = function(){
-        var targetTransform = this.target.gameObject.transform;
+    CameraScript.prototype.removeTarget = function () {
+        if (this.target !== null) {
+            var targetTransform = this.target.gameObject.transform;
 
-        this.target = null;
+            this.target = null;
 
-        targetTransform.removeEventListener(targetTransform.events.update, this.onTargetUpdate);
+            targetTransform.removeEventListener(targetTransform.events.Update, this.onTargetUpdate);
+        }
     }
 
-    CameraScript.prototype.moveTo = function(transform){
+    CameraScript.prototype.moveTo = function (transform) {
         var pos = transform.getPosition();
         this.gameObject.transform.setPosition(pos[0], pos[1], pos[2]);
     }
-    
+
     return CameraScript;
 });

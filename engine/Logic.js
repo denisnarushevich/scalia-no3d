@@ -34,7 +34,7 @@ define(['./Time', './World'], function (Time, World) {
     /**
      * @return {void}
      */
-    p.Tick = function () {
+    p.tick = function () {
         var now = Date.now(), i = 0;
         var frameTime = now - this.time.now,
             dt = this.time.dt;

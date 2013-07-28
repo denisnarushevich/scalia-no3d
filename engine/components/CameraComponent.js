@@ -68,7 +68,6 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
         var cam = this;
 
         gameObject.transform.addEventListener(gameObject.transform.events.Update, function(){
-            console.log(123);
 
             //update frustumbox
             var localToWorld = cam.gameObject.transform.getLocalToWorld();

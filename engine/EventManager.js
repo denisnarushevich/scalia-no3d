@@ -34,7 +34,7 @@ define(function () {
     }
 
     p.removeEventListener = function(event, callback){
-        this.eventListeners.splice(this.eventListeners.indexOf(callback), 1);
+        this.eventListeners[event].splice(this.eventListeners[event].indexOf(callback), 1);
     }
 
     return EventManager;

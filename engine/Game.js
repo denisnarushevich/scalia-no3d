@@ -44,9 +44,9 @@ define(["./Logic", "./Graphics"], function (Logic, Graphics) {
      * @type {void}
      */
     p.MainLoop = function () {
-        this.logic.Tick();
+        this.logic.tick();
 
-        this.graphics.Render();
+        this.graphics.render();
 
         var game = this;
         requestAnimFrame(function () {

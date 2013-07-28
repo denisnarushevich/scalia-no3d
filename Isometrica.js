@@ -1,4 +1,11 @@
-define(['./engine/engine', './Tiles', './components/CameraScript', './gameObjects/Ball', './components/CameraScript'], function (Scalia, Tiles, CC, Ball, CameraScript) {
+define([
+    './engine/engine',
+    './Tiles',
+    './components/CameraScript',
+    './gameObjects/Ball',
+    './components/CameraScript',
+    './components/MainScript'
+], function (Scalia, Tiles, CC, Ball, CameraScript, MainScript) {
     function Isometrica() {
         // Isometrica is not trully isometric, it's dimetric with 2:1 ratio (Transport Tycoon used this).
         // It means, that when point goes about 1px by X, it moves 1/2 pixel by Y.
@@ -36,14 +43,13 @@ define(['./engine/engine', './Tiles', './components/CameraScript', './gameObject
         //5.fill terrain with that data (buildings)
         //*onmousemove start over from #1
 
+        var gameSystem = new scaliaEngine.GameObject();
+        var mainScript = new MainScript();
+        gameSystem.addComponent(mainScript);
+        this.game.logic.world.addGameObject(gameSystem);
 
-        this.tiles = new Tiles(this);
-        //TODO actually, camera should be initialized in gameView.
-        cameraObject = this.camera = new scaliaEngine.gameObjects.Camera(document.width, document.height, 100);
-        cameraObject.addComponent(new CC());
-        cameraObject.transform.rotate(30, 45, 0, "self");
-        cameraObject.transform.translate(2000,0,2000,'world');
-        this.game.logic.world.addGameObject(cameraObject);
+        this.tiles = new Tiles(this);             //todo: move to mainScript
+
 
 
         for(var i = 0; i<5000; i++){
@@ -54,12 +60,24 @@ define(['./engine/engine', './Tiles', './components/CameraScript', './gameObject
 
         this.game.Run();
 
-        var viewport = this.game.graphics.CreateViewport();
-        viewport.setCamera(cameraObject);
+
+        var viewport = this.game.graphics.createViewport();
+        viewport.setCamera(mainScript.mainCamera);
         document.body.appendChild(viewport.canvas);
         viewport.setSize(viewport.canvas.offsetWidth, viewport.canvas.offsetHeight);
 
-        cameraObject.getComponent(CameraScript).setTarget(ball.transform);
+
+
+
+
+
+
+
+        var viewport2 = this.game.graphics.createViewport(document.getElementById("vpcnv"));
+        viewport2.setCamera(mainScript.createCamera()).setSize(viewport2.canvas.offsetWidth, viewport2.canvas.offsetHeight);
+        viewport2.camera.getComponent(CameraScript).setTarget(ball.transform);
+
+
 
     }
 

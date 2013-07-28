@@ -32,8 +32,8 @@ define(["./Viewport", "./CanvasRenderer"], function (Viewport, CanvasRenderer) {
      * @param {CameraComponent} camera
      * @return {Viewport}
      */
-    p.CreateViewport = function(){
-        var viewport = new Viewport(this);
+    p.createViewport = function(canvas){
+        var viewport = new Viewport(this, canvas);
         this.viewports.push(viewport);
         return viewport;
     }
@@ -41,7 +41,7 @@ define(["./Viewport", "./CanvasRenderer"], function (Viewport, CanvasRenderer) {
     /**
      * @return {void}
      */
-    p.Render = function(){
+    p.render = function(){
         var viewports = this.viewports,
             viewportsCount = viewports.length;
         for(var i = 0; i < viewportsCount; i++){
