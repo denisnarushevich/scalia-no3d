@@ -34,14 +34,22 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
         });
 
         this.canvas.addEventListener("mousedown", function(e){
+            e.pageX -= viewport.canvas.offsetLeft;
+            e.pageY -= viewport.canvas.offsetTop;
             viewport.dispatchEvent(viewport.events.pointerdown, e);
         });
 
         this.canvas.addEventListener("mouseup", function(e){
+            console.log({a:viewport.canvas});
+            e.pageX -= viewport.canvas.offsetLeft;
+            e.pageY -= viewport.canvas.offsetTop;
             viewport.dispatchEvent(viewport.events.pointerup, e);
         });
 
         this.canvas.addEventListener("mousemove", function(e){
+
+            e.pageX -= viewport.canvas.offsetLeft;
+            e.pageY -= viewport.canvas.offsetTop;
             viewport.dispatchEvent(viewport.events.pointermove, e);
         });
     }

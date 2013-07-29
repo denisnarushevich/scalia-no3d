@@ -104,5 +104,9 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
         }
     }
 
+    p.destroy = function(){
+        this.world.removeGameObject(this);
+    }
+
     return GameObject;
 });

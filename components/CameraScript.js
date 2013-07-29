@@ -14,6 +14,7 @@ define(['../engine/engine'], function (scalia) {
     cameraScript.onPointerDown;
     cameraScript.onPointerUp;
     cameraScript.pointerPos = null;
+    cameraScript.moveLen;
 
     /**
      * Executes when component is added to gameObject
@@ -30,17 +31,33 @@ define(['../engine/engine'], function (scalia) {
 
             script.onPointerDown = function(e){
                 script.pointerPos = [e.pageX, e.pageY];
+                script.moveLen = [0,0];
                 script.removeTarget();
             }
 
             script.onPointerUp = function(e){
+                if(Math.sqrt(Math.pow(script.moveLen[0],2) + Math.pow(script.moveLen[1],2)) > 10){
+                    //pan
+                    console.log("pan");
+                }else{
+                    //click
+                    console.log("click");
+                    script.pickTile(e.pageX, e.pageY);
+                }
+
+                script.moveLen = null;
                 script.pointerPos = null;
             }
 
             script.onPointerMove = function(e){
+
+
                 if (script.pointerPos !== null) {
                     var x = e.pageX - script.pointerPos[0],
                         y = e.pageY - script.pointerPos[1];
+
+                    script.moveLen[0] += x;
+                    script.moveLen[1] += y;
 
                     script.pointerPos[0] = e.pageX;
                     script.pointerPos[1] = e.pageY;
@@ -103,6 +120,29 @@ define(['../engine/engine'], function (scalia) {
     CameraScript.prototype.moveTo = function (transform) {
         var pos = transform.getPosition();
         this.gameObject.transform.setPosition(pos[0], pos[1], pos[2]);
+    }
+
+    cameraScript.pickTile = function(x, y){
+        var gameObjects = this.gameObject.world.retrieve(this.gameObject),
+            gameObject,
+            camera = this.gameObject.getComponent(scalia.components.CameraComponent);
+
+        console.log(x,y)
+
+        for(var i = 0; i < gameObjects.length; i++){
+            gameObject = gameObjects[i];
+            var wTs = camera.getWorldToScreen();
+            var pos = gameObject.transform.getPosition();
+            var r = [];
+            scalia.gl.vec3.transformMat4(r, pos, wTs);
+
+            if(r[0] < x + 50 && r[0] > x - 50){
+                if(r[1] < y + 50 && r[1] > y - 50){
+                    console.log(gameObject);
+                    gameObject.destroy();
+                }
+            }
+        }
     }
 
     return CameraScript;

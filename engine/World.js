@@ -34,6 +34,11 @@ define(function () {
         gameObject.setWorld(this);
     }
 
+    p.removeGameObject = function(gameObject){
+        this.gameObjects.splice(this.gameObjects.indexOf(gameObject), 1);
+        this.gameObjectsCount--;
+    }
+
     p.retrieve = function(gameObject){
         return this.gameObjects.slice(0);
     }
