@@ -12,6 +12,12 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
         this.bounds = new BoundingBox();
         this.worldToScreenMatrix = new Float32Array(16);
         this.worldToViewportMatrix = new Float32Array(16);
+
+        this.events = {
+            update: 0,
+            viewportSet: 1,
+            viewportRemoved: 2
+        }
     }
 
     var p = CameraComponent.prototype = Object.create(Component.prototype);
@@ -60,6 +66,13 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
 
             glMatrix.mat4.mul(cam.worldToViewportMatrix, cam.projectionMatrix, cam.gameObject.transform.getWorldToLocal());
         });
+
+        this.dispatchEvent(this.events.viewportSet, this);
+    }
+
+    p.removeViewport = function(){
+        this.dispatchEvent(this.events.viewportRemoved, this);
+        this.viewport = null;
     }
 
     p.setGameObject = function(gameObject){

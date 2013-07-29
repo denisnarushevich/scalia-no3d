@@ -8,7 +8,10 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
         EventManager.call(this);
         this.events = {
             update: 0,
-            resize: 1
+            resize: 1,
+            pointerdown: 2,
+            pointerup: 3,
+            pointermove: 4
         }
 
         this.canvas = canvas || document.createElement('canvas');
@@ -28,6 +31,18 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
         var viewport = this;
         window.addEventListener('resize', function(){
             viewport.setSize(viewport.canvas.offsetWidth, viewport.canvas.offsetHeight);
+        });
+
+        this.canvas.addEventListener("mousedown", function(e){
+            viewport.dispatchEvent(viewport.events.pointerdown, e);
+        });
+
+        this.canvas.addEventListener("mouseup", function(e){
+            viewport.dispatchEvent(viewport.events.pointerup, e);
+        });
+
+        this.canvas.addEventListener("mousemove", function(e){
+            viewport.dispatchEvent(viewport.events.pointermove, e);
         });
     }
 
