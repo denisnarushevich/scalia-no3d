@@ -1,5 +1,9 @@
 define(['../engine/engine'], function (scalia) {
     function CameraScript() {
+        this.tmpctx = document.createElement("canvas").getContext("2d");
+        this.tmpctx.canvas.width = 1000;
+        this.tmpctx.canvas.height = 1000;
+        this.bufferVec3 = new Float32Array(3);
     }
 
     var cameraScript = CameraScript.prototype = Object.create(scalia.Component.prototype);
@@ -15,43 +19,44 @@ define(['../engine/engine'], function (scalia) {
     cameraScript.onPointerUp;
     cameraScript.pointerPos = null;
     cameraScript.moveLen;
+    cameraScript.tmpctx;
+    cameraScript.bufferVec3;
 
     /**
      * Executes when component is added to gameObject
      */
-    CameraScript.prototype.awake = function(){
+    CameraScript.prototype.awake = function () {
         this.gameObject.transform.rotate(30, 45, 0, "self");
-        this.gameObject.transform.translate(2000,0,2000,'world');
+        this.gameObject.transform.translate(2000, 0, 2000, 'world');
 
         var camera = this.gameObject.getComponent(scalia.components.CameraComponent),
             script = this;
 
-        camera.addEventListener(camera.events.viewportSet, function(camera){
+        camera.addEventListener(camera.events.viewportSet, function (camera) {
             var viewport = camera.viewport;
 
-            script.onPointerDown = function(e){
+            script.onPointerDown = function (e) {
                 script.pointerPos = [e.pageX, e.pageY];
-                script.moveLen = [0,0];
+                script.moveLen = [0, 0];
                 script.removeTarget();
             }
 
-            script.onPointerUp = function(e){
-                if(Math.sqrt(Math.pow(script.moveLen[0],2) + Math.pow(script.moveLen[1],2)) > 10){
-                    //pan
-                    console.log("pan");
-                }else{
-                    //click
-                    console.log("click");
-                    script.pickTile(e.pageX, e.pageY);
-                }
+            script.onPointerUp = function (e) {
+                if (script.pointerPos !== null) {
+                    if (Math.sqrt(Math.pow(script.moveLen[0], 2) + Math.pow(script.moveLen[1], 2)) > 10) {
+                        //pan
+                    } else {
+                        //click
+                        console.log(e.pageX, e.pageY)
+                        script.pickTile(e.pageX, e.pageY);
+                    }
 
-                script.moveLen = null;
-                script.pointerPos = null;
+                    script.moveLen = null;
+                    script.pointerPos = null;
+                }
             }
 
-            script.onPointerMove = function(e){
-
-
+            script.onPointerMove = function (e) {
                 if (script.pointerPos !== null) {
                     var x = e.pageX - script.pointerPos[0],
                         y = e.pageY - script.pointerPos[1];
@@ -71,19 +76,29 @@ define(['../engine/engine'], function (scalia) {
                 }
             }
 
+            script.onPointerOut = function (e) {
+                if (script.pointerPos !== null) {
+                    script.moveLen = null;
+                    script.pointerPos = null;
+                }
+            }
+
             viewport.addEventListener(viewport.events.pointerdown, script.onPointerDown);
 
             viewport.addEventListener(viewport.events.pointerup, script.onPointerUp);
 
             viewport.addEventListener(viewport.events.pointermove, script.onPointerMove);
+
+            viewport.addEventListener(viewport.events.pointerout, script.onPointerOut);
         });
 
-        camera.addEventListener(camera.events.viewportRemoved, function(camera){
+        camera.addEventListener(camera.events.viewportRemoved, function (camera) {
             var viewport = camera.viewport;
 
             viewport.removeEventListener(viewport.events.pointerdown, script.onPointerDown);
             viewport.removeEventListener(viewport.events.pointerup, script.onPointerUp);
             viewport.removeEventListener(viewport.events.pointermove, script.onPointerMove);
+            viewport.removeEventListener(viewport.events.pointerout, script.onPointerOut);
         });
     }
 
@@ -122,24 +137,42 @@ define(['../engine/engine'], function (scalia) {
         this.gameObject.transform.setPosition(pos[0], pos[1], pos[2]);
     }
 
-    cameraScript.pickTile = function(x, y){
+    cameraScript.pickTile = function (x, y) {
         var gameObjects = this.gameObject.world.retrieve(this.gameObject),
             gameObject,
-            camera = this.gameObject.getComponent(scalia.components.CameraComponent);
+            camera = this.gameObject.getComponent(scalia.components.CameraComponent),
+            wTs = camera.getWorldToScreen(),
+            wTv = camera.getWorldToViewport(),
+            v1 = [], v2 = [];
 
-        console.log(x,y)
-
-        for(var i = 0; i < gameObjects.length; i++){
+        for (var i = 0; i < gameObjects.length; i++) {
             gameObject = gameObjects[i];
-            var wTs = camera.getWorldToScreen();
-            var pos = gameObject.transform.getPosition();
-            var r = [];
-            scalia.gl.vec3.transformMat4(r, pos, wTs);
+            if (gameObject.layer !== 0)
+                continue;
 
-            if(r[0] < x + 50 && r[0] > x - 50){
-                if(r[1] < y + 50 && r[1] > y - 50){
-                    console.log(gameObject);
-                    gameObject.destroy();
+            gameObject.transform.getPosition(v1);
+
+            //skip objects that lay outside of screen
+            scalia.gl.vec3.transformMat4(v2, v1, wTv);
+            if (Math.abs(v2[0]) > 1 || Math.abs(v2[1]) > 1)
+                continue;
+
+            scalia.gl.vec3.transformMat4(v2, v1, wTs);
+            var sprite = gameObject.getComponent(scalia.components.SpriteComponent);
+            if (sprite !== null) {
+                var x0 = v2[0] - sprite.pivot[0],
+                    y0 = v2[1] - sprite.pivot[1],
+                    x1 = x0 + sprite.width,
+                    y1 = y0 + sprite.height;
+
+                if (x >= x0 && x <= x1) {
+                    if (y >= y0 && y <= y1) {
+                        this.tmpctx.clearRect(0, 0, sprite.width, sprite.height);
+                        this.tmpctx.drawImage(sprite.image, 0, 0);
+                        if (this.tmpctx.getImageData(x - x0, y - y0, 1, 1).data[3] > 0) {
+                            gameObject.destroy();
+                        }
+                    }
                 }
             }
         }

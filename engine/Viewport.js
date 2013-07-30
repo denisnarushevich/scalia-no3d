@@ -11,7 +11,9 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
             resize: 1,
             pointerdown: 2,
             pointerup: 3,
-            pointermove: 4
+            pointermove: 4,
+            poiterin: 5,
+            pointerout: 6
         }
 
         this.canvas = canvas || document.createElement('canvas');
@@ -34,23 +36,43 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
         });
 
         this.canvas.addEventListener("mousedown", function(e){
-            e.pageX -= viewport.canvas.offsetLeft;
-            e.pageY -= viewport.canvas.offsetTop;
-            viewport.dispatchEvent(viewport.events.pointerdown, e);
+            var offset = viewport.getOffset();
+            viewport.dispatchEvent(viewport.events.pointerdown, { //custom event args. this can be moved to separate class e.g. PointerEventArgs.
+                pageX: e.pageX - offset[0],
+                pageY: e.pageY - offset[1]
+            });
         });
 
         this.canvas.addEventListener("mouseup", function(e){
-            console.log({a:viewport.canvas});
-            e.pageX -= viewport.canvas.offsetLeft;
-            e.pageY -= viewport.canvas.offsetTop;
-            viewport.dispatchEvent(viewport.events.pointerup, e);
+            var offset = viewport.getOffset();
+            viewport.dispatchEvent(viewport.events.pointerup, {
+                pageX: e.pageX - offset[0],
+                pageY: e.pageY - offset[1]
+            });
         });
 
         this.canvas.addEventListener("mousemove", function(e){
+            var offset = viewport.getOffset();
+            viewport.dispatchEvent(viewport.events.pointermove, {
+                pageX: e.pageX - offset[0],
+                pageY: e.pageY - offset[1]
+            });
+        });
 
-            e.pageX -= viewport.canvas.offsetLeft;
-            e.pageY -= viewport.canvas.offsetTop;
-            viewport.dispatchEvent(viewport.events.pointermove, e);
+        this.canvas.addEventListener("mousein", function(e){
+            var offset = viewport.getOffset();
+            viewport.dispatchEvent(viewport.events.pointerin, {
+                pageX: e.pageX - offset[0],
+                pageY: e.pageY - offset[1]
+            });
+        });
+
+        this.canvas.addEventListener("mouseout", function(e){
+            var offset = viewport.getOffset();
+            viewport.dispatchEvent(viewport.events.pointerout, {
+                pageX: e.pageX - offset[0],
+                pageY: e.pageY - offset[1]
+            });
         });
     }
 
@@ -129,6 +151,17 @@ define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRende
         this.camera.camera.setViewport(this);
 
         return this;
+    }
+
+    p.getOffset = function(){
+        var offset = [0,0];
+        var current = this.canvas;
+        while(current != null){
+            offset[0] += current.offsetLeft;
+            offset[1] += current.offsetTop;
+            current = current.offsetParent;
+        }
+        return offset;
     }
 
     return Viewport;

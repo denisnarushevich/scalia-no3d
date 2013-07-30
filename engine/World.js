@@ -25,6 +25,8 @@ define(function () {
      */
     p.gameObjectsCount = 0;
 
+    p.started = false;
+
     /**
      * Array with gameObjects
      * @param {GameObject} gameObject
@@ -32,6 +34,8 @@ define(function () {
     p.addGameObject = function(gameObject){
         this.gameObjects[this.gameObjectsCount++] = gameObject;
         gameObject.setWorld(this);
+        if(this.started)
+            gameObject.start();
     }
 
     p.removeGameObject = function(gameObject){
@@ -44,6 +48,7 @@ define(function () {
     }
 
     p.start = function(){
+        this.started = true;
         for(var i = 0; i < this.gameObjectsCount; i++)
             this.gameObjects[i].start();
     }

@@ -95,6 +95,7 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
             if(component instanceof Type)
                 return component;
         }
+        return null;
     }
 
     p.tick = function(){

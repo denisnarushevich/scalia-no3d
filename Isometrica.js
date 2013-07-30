@@ -1,11 +1,7 @@
 define([
     './engine/engine',
-    './Tiles',
-    './components/CameraScript',
-    './gameObjects/Ball',
-    './components/CameraScript',
     './components/MainScript'
-], function (Scalia, Tiles, CC, Ball, CameraScript, MainScript) {
+], function (Scalia, MainScript) {
     function Isometrica() {
         // Isometrica is not trully isometric, it's dimetric with 2:1 ratio (Transport Tycoon used this).
         // It means, that when point goes about 1px by X, it moves 1/2 pixel by Y.
@@ -48,15 +44,7 @@ define([
         gameSystem.addComponent(mainScript);
         this.game.logic.world.addGameObject(gameSystem);
 
-        this.tiles = new Tiles(this);             //todo: move to mainScript
 
-
-
-        for(var i = 0; i<5000; i++){
-            var ball = new Ball();
-            ball.transform.translate(Math.random()*4000, 0,Math.random()*4000, "world");
-            this.game.logic.world.addGameObject(ball);
-        }
 
         this.game.Run();
 
@@ -75,7 +63,6 @@ define([
 
         var viewport2 = this.game.graphics.createViewport(document.getElementById("vpcnv"));
         viewport2.setCamera(mainScript.createCamera()).setSize(viewport2.canvas.offsetWidth, viewport2.canvas.offsetHeight);
-        viewport2.camera.getComponent(CameraScript).setTarget(ball.transform);
 
 
 

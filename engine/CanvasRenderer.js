@@ -32,8 +32,8 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
         for (i = 0; i < gameObjectsCount; i++) {
             gameObject = gameObjects[i];
 
-            if (gameObject === this.camera)
-                continue;
+           if (gameObject === camera)
+               continue;
 
             //primitive clipspace culling
             gameObject.transform.getPosition(bufferVec3);
@@ -64,8 +64,6 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
             for (j = 0; j < gameObjectsCount; j++) {
                 gameObject = gameObjects.pop();
 
-                if (gameObject === this.camera)continue;
-
                 if (gameObject.sprite !== undefined) {
                     this.RenderSprite(gameObject.sprite, ctx);
                 }
@@ -85,7 +83,7 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
         layer.drawImage(sprite.image, 0, 0, sprite.width, sprite.height, Math.round(bufferVec3[0] - sprite.pivot[0]), Math.round(bufferVec3[1] - sprite.pivot[1]), sprite.width, sprite.height);
     }
 
-    p.RenderAxis = function (gameObject) {
+    p.RenderAxis = function (gameObject, ctx) {
         var W = gameObject.transform.getLocalToWorld(),
             pos0 = gameObject.transform.getPosition();
 
@@ -101,12 +99,12 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
         glMatrix.vec3.transformMat4(pos, pos, W);
         glMatrix.vec3.transformMat4(pos, pos, this.M);
 
-        this.context.beginPath();
-        this.context.moveTo(pos0[0], pos0[1]);
-        this.context.lineTo(pos[0], pos[1]);
-        this.context.closePath();
-        this.context.strokeStyle = '#ff0000';
-        this.context.stroke();
+        ctx.beginPath();
+        ctx.moveTo(pos0[0], pos0[1]);
+        ctx.lineTo(pos[0], pos[1]);
+        ctx.closePath();
+        ctx.strokeStyle = '#ff0000';
+        ctx.stroke();
 
         //draw Y
         pos[0] = 0;
@@ -116,12 +114,12 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
         glMatrix.vec3.transformMat4(pos, pos, W);
         glMatrix.vec3.transformMat4(pos, pos, this.M);
 
-        this.context.beginPath();
-        this.context.moveTo(pos0[0], pos0[1]);
-        this.context.lineTo(pos[0], pos[1]);
-        this.context.closePath();
-        this.context.strokeStyle = '#00ff00';
-        this.context.stroke();
+        ctx.beginPath();
+        ctx.moveTo(pos0[0], pos0[1]);
+        ctx.lineTo(pos[0], pos[1]);
+        ctx.closePath();
+        ctx.strokeStyle = '#00ff00';
+        ctx.stroke();
 
         //draw Z
         pos[0] = 0;
@@ -131,12 +129,12 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
         glMatrix.vec3.transformMat4(pos, pos, W);
         glMatrix.vec3.transformMat4(pos, pos, this.M);
 
-        this.context.beginPath();
-        this.context.moveTo(pos0[0], pos0[1]);
-        this.context.lineTo(pos[0], pos[1]);
-        this.context.closePath();
-        this.context.strokeStyle = '#0000ff';
-        this.context.stroke();
+        ctx.beginPath();
+        ctx.moveTo(pos0[0], pos0[1]);
+        ctx.lineTo(pos[0], pos[1]);
+        ctx.closePath();
+        ctx.strokeStyle = '#0000ff';
+        ctx.stroke();
     }
 
     return CanvasRenderer;
