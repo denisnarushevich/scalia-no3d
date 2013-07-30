@@ -170,7 +170,7 @@ define(['../engine/engine'], function (scalia) {
                         this.tmpctx.clearRect(0, 0, sprite.width, sprite.height);
                         this.tmpctx.drawImage(sprite.image, 0, 0);
                         if (this.tmpctx.getImageData(x - x0, y - y0, 1, 1).data[3] > 0) {
-                            gameObject.destroy();
+                            this.gameObject.getComponent(scalia.components.CameraComponent).viewport.graphics.viewports[1].camera.getComponent(CameraScript).moveTo(gameObject.transform);
                         }
                     }
                 }

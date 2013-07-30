@@ -15,7 +15,8 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
 
         var strm = this,
             n = this.chunkSize;
-        this.mainCamera.camera.addEventListener(this.mainCamera.transform.events.update, function () {
+
+        var l = function () {
             var position = strm.mainCamera.transform.getPosition(),
                 chunkX0 = ((position[0] / 45.255 / n) | 0),
                 chunkY0 = ((position[2] / 45.255 / n) | 0);
@@ -25,8 +26,11 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
                     y = i - x * 3;
                 strm.loadChunk(chunkX0 + x - 1, chunkY0 + y - 1);
             }
+        };
 
-        })
+        this.mainCamera.camera.addEventListener(this.mainCamera.transform.events.update, l);
+
+        l();
 
     }
 
