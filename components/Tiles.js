@@ -8,7 +8,7 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
 
     Tiles.prototype.mainCamera = null;
     Tiles.prototype.chunckStatus = null;
-    Tiles.prototype.chunkSize = 8;
+    Tiles.prototype.chunkSize = 16;
 
     Tiles.prototype.start = function () {
         //scalia.Component.prototype.start.call(this); //calls parent start, but does nothing
