@@ -6,7 +6,7 @@ define(function () {
     AssetManager.prototype.assets = {};
 
     //FIX: if there is two simultaneous requests for unexisting asset,
-    //then it will be loaded twice, and Iamge/Audio object will be created twice.
+    //then it will be loaded twice, and Image/Audio object will be created twice.
     //fix that please.
     AssetManager.prototype.getAsset = function (name, onsuccess, onprogress) {
         if (this.assets[name] !== undefined) {

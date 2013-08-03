@@ -18,6 +18,7 @@ define(['../engine/engine', '../gameObjects/Ball'], function (scalia, Ball) {
     TileComponent.prototype.setData = function(data){
         this.data = data;
 
+        /*
         if (Math.random() > 0.75) {
             var ball = new Ball();
             var pos = this.gameObject.transform.getPosition();
@@ -25,9 +26,11 @@ define(['../engine/engine', '../gameObjects/Ball'], function (scalia, Ball) {
             this.gameObject.world.addGameObject(ball);
 
 
-        }
+        }   */
 
-        this.gameObject.sprite.image = this.gameObject.sprite.image2;
+        if(data.ownerId === 1){
+            this.gameObject.sprite.image = this.gameObject.sprite.image2;
+        }
 
         this.dispatchEvent(this.events.dataSet, this);
     }

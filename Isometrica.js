@@ -1,7 +1,8 @@
 define([
     './engine/engine',
-    './components/MainScript'
-], function (Scalia, MainScript) {
+    './components/MainScript',
+    './socket.io.min'
+], function (Scalia, MainScript, io) {
     function Isometrica() {
         // Isometrica is not trully isometric, it's dimetric with 2:1 ratio (Transport Tycoon used this).
         // It means, that when point goes about 1px by X, it moves 1/2 pixel by Y.
@@ -38,6 +39,8 @@ define([
         //4.load terrain data for tiles around camera position
         //5.fill terrain with that data (buildings)
         //*onmousemove start over from #1
+
+        this.server = io.connect("127.0.0.1:91");
 
         var gameSystem = new scaliaEngine.GameObject();
         var mainScript = new MainScript();
