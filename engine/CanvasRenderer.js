@@ -11,6 +11,25 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
         bufferVec3 = new Float32Array([0, 0, 0]),
         bufferMat4 = new Float32Array(16);
 
+    p.F = function (gameObject) {
+        var transform = gameObject.transform;
+
+        //primitive clipspace culling
+        gameObject.transform.getPosition(bufferVec3);
+        glMatrix.vec3.transformMat4(bufferVec3, bufferVec3, this.pM);
+        if (Math.abs(bufferVec3[0]) <= 1 && Math.abs(bufferVec3[1]) <= 1) {
+            this.layerBuffers[gameObject.layer].push(gameObject);
+            /*
+             if(transform.children.length !== 0){
+             var childGameObject;
+             for(var i = 0; i < transform.children.length; i++){
+             childGameObject = transform.children[i].gameObject;
+             this.F(childGameObject);
+             }
+             }                                                         */
+        }
+    }
+
     p.Render = function (camera, viewport) {
         var gameObjects = camera.world.retrieve(camera),
             gameObjectsCount = gameObjects.length,
@@ -24,25 +43,22 @@ define(["./lib/gl-matrix", "./Layers"], function (glMatrix, Layers) {
         this.M = camera.camera.getWorldToScreen()
 
 
-
         viewport.context.clearRect(0, 0, viewport.size[0], viewport.size[1]);
 
+        /*
+        if (camera.backgroundPattern) {
 
 
-        for (i = 0; i < gameObjectsCount; i++) {
-            gameObject = gameObjects[i];
+            var image = camera.backgroundPattern;
+            var pat = viewport.context.createPattern(image, "repeat");
+            viewport.context.rect(0, 0, viewport.size[0], viewport.size[1]);
+            viewport.context.fillStyle = pat;
+            viewport.context.fill();
+        }       */
 
-           if (gameObject === camera)
-               continue;
 
-            //primitive clipspace culling
-            gameObject.transform.getPosition(bufferVec3);
-            glMatrix.vec3.transformMat4(bufferVec3, bufferVec3, this.pM);
-            if (Math.abs(bufferVec3[0]) > 1 || Math.abs(bufferVec3[1]) > 1)
-                continue;
-
-            this.layerBuffers[gameObject.layer].push(gameObject);
-        }
+        for (i = 0; i < gameObjectsCount; i++)
+            this.F(gameObjects[i]);
 
         for (i = 0; i < layersCount; i++) {
             layer = Layers.layers[i];

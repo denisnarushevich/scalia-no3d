@@ -1,18 +1,49 @@
 define(function () {
     function AssetManager() {
         this.assets = {};
+        this.callbacks = {};
     }
 
     AssetManager.prototype.assets = {};
 
-    //FIX: if there is two simultaneous requests for unexisting asset,
-    //then it will be loaded twice, and Image/Audio object will be created twice.
-    //fix that please.
+    /**
+     * If assets is loaded then function will immediatelly call onsuccess callback
+     * If assets is not loaded it will start loading it
+     * If assets is not loaded but is already loading, then given callback will be called once loading finishes.
+     * @param {string} name asset's filename including path
+     * @param {function} onsuccess
+     * @param {function} onprogress
+     */
     AssetManager.prototype.getAsset = function (name, onsuccess, onprogress) {
         if (this.assets[name] !== undefined) {
-            onsuccess(this.assets[name]);
+            if (this.assets[name] !== "loading") {
+                onsuccess(this.assets[name]);
+            } else {
+                this.callbacks[name].push({
+                    onsuccess: onsuccess,
+                    onprogress: onprogress
+                });
+            }
         } else {
-            this.loadAsset(name, onsuccess, onprogress);
+            this.assets[name] = "loading";
+            this.callbacks[name] = [
+                {
+                    onsuccess: onsuccess,
+                    onprogress: onprogress
+                }
+            ];
+            var assetManager = this;
+            this.loadAsset(name, function (obj) {
+                for (var i = 0; i < assetManager.callbacks[name].length; i++) {
+                    if (assetManager.callbacks[name][i].onsuccess)
+                        assetManager.callbacks[name][i].onsuccess(obj);
+                }
+            }, function (e) {
+                for (var i = 0; i < assetManager.callbacks[name].length; i++) {
+                    if (assetManager.callbacks[name][i].onprogress)
+                        assetManager.callbacks[name][i].onprogress(e);
+                }
+            });
         }
     };
 

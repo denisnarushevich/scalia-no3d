@@ -1,5 +1,5 @@
-define(['../engine/engine', './CameraScript', './Tiles'], function(scalia, CameraScript, WorldStreamer){
-    function MainScript(){
+define(['../engine/engine', './CameraScript', './Tiles'], function (scalia, CameraScript, WorldStreamer) {
+    function MainScript() {
 
     }
 
@@ -7,11 +7,15 @@ define(['../engine/engine', './CameraScript', './Tiles'], function(scalia, Camer
 
     MainScript.prototype.mainCamera = null;
 
-    MainScript.prototype.start = function(){
+    MainScript.prototype.start = function () {
         scalia.Component.prototype.start.call(this); //calls parent start, but does nothing
 
         this.mainCamera = new scaliaEngine.gameObjects.Camera();
         this.mainCamera.addComponent(new CameraScript());
+        /*var cam = this.mainCamera;
+        scalia.Assets.getAsset('./dirt.jpg', function (image) {
+            cam.backgroundPattern = image;
+        });*/
         this.gameObject.world.addGameObject(this.mainCamera);
 
 
@@ -20,7 +24,7 @@ define(['../engine/engine', './CameraScript', './Tiles'], function(scalia, Camer
         worldStreamer.mainCamera = this.mainCamera;
     }
 
-    MainScript.prototype.createCamera = function(){
+    MainScript.prototype.createCamera = function () {
         var camera = new scaliaEngine.gameObjects.Camera();
         camera.addComponent(new CameraScript());
         this.gameObject.world.addGameObject(camera);

@@ -1,8 +1,9 @@
 define([
     './engine/engine',
     './components/MainScript',
-    './socket.io.min'
-], function (Scalia, MainScript, io) {
+    './socket.io.min',
+    './gameObjects/Ball'
+], function (Scalia, MainScript, io, Ball) {
     function Isometrica() {
         // Isometrica is not trully isometric, it's dimetric with 2:1 ratio (Transport Tycoon used this).
         // It means, that when point goes about 1px by X, it moves 1/2 pixel by Y.
@@ -21,7 +22,7 @@ define([
 
 
         var isometrica = this;
-        Scalia.Assets.loadBatch(['./tile.png', './tile2.png', './green-ball-small.png'], function () {
+        Scalia.Assets.loadBatch(['./tile.png', './tile2.png', './green-ball-small.png', './dirt.jpg'], function () {
                 console.log('starting');
                 isometrica.start();
             },
@@ -68,7 +69,12 @@ define([
         viewport2.setCamera(mainScript.createCamera()).setSize(viewport2.canvas.offsetWidth, viewport2.canvas.offsetHeight);
 
 
+        var a = new Ball();
+        var b = new Ball();
 
+        a.transform.addChild(b.transform);
+
+        this.game.logic.world.addGameObject(a);
     }
 
     /**

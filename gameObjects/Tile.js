@@ -11,6 +11,7 @@ define(["../engine/engine", '../components/TileComponent'], function (scalia, Ti
             sprite.pivot = [32, 24];
         });
 
+        sprite.image2 = new Image();
         scalia.Assets.getAsset('./tile.png', function (image) {
             sprite.image2 = image;
         });

@@ -36,11 +36,25 @@ define(function () {
         gameObject.setWorld(this);
         if(this.started)
             gameObject.start();
+
+        if(gameObject.transform.children.length !== 0){
+            for(var i = 0; i < gameObject.transform.children.length; i++){
+                var child = gameObject.transform.children[i].gameObject;
+                this.addGameObject(child);
+            }
+        }
     }
 
     p.removeGameObject = function(gameObject){
         this.gameObjects.splice(this.gameObjects.indexOf(gameObject), 1);
         this.gameObjectsCount--;
+
+        if(gameObject.transform.children.length !== 0){
+            for(var i = 0; i < gameObject.transform.children.length; i++){
+                var child = gameObject.transform.children[i].gameObject;
+                this.removeGameObject(child);
+            }
+        }
     }
 
     p.retrieve = function(gameObject){

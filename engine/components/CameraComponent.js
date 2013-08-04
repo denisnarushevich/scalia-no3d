@@ -18,6 +18,8 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
             viewportSet: 1,
             viewportRemoved: 2
         }
+
+
     }
 
     var p = CameraComponent.prototype = Object.create(Component.prototype);
@@ -30,6 +32,8 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
 
     p.worldToScreenMatrix = null;
     p.worldToViewportMatrix = null;
+
+    //p.backgroundPattern = null;
 
     p.start = function(){
         var cam = this;
