@@ -13,7 +13,6 @@ define(['../engine/engine', '../gameObjects/Ball'], function (scalia, Ball) {
 
     TileComponent.prototype.start = function () {
         var transform = this.gameObject.transform;
-        this.lifting = true
         transform.translate(0,-(Math.random()*400+100),0);
     }
 
@@ -38,10 +37,7 @@ define(['../engine/engine', '../gameObjects/Ball'], function (scalia, Ball) {
     }
 
     TileComponent.prototype.tick = function(){
-        if(this.lifting)
             this.gameObject.transform.translate(0,Math.abs(this.gameObject.transform.getLocalPosition()[1]/3),0);
-        else
-            this.lifting = false
     }
 
     return TileComponent;
