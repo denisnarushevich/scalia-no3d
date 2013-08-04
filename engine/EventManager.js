@@ -6,7 +6,7 @@ define(function () {
     var p = EventManager.prototype;
 
     p.events = {
-        Update: "Update"
+        update: 0
     };
 
     p.eventListeners = null;

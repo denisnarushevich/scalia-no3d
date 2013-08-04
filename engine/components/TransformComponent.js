@@ -31,6 +31,8 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
             0, 0, 0, 1
         ];
 
+        //When parent updates, our coords changes
+        //so let's set flag to update out matrices
         var self = this;
         this.onParentUpdate = function(parent){
             self.dirtyL = true;
@@ -106,7 +108,7 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
         this.dirtyL = true; //flag to update localToWorld
         this.dirtyW = true; //flag to update worldToLocal
 
-        this.dispatchEvent(this.events.Update, this);
+        this.dispatchEvent(this.events.update, this);
     }
 
     p.rotate = function (x, y, z, relativeTo) {
@@ -130,7 +132,7 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
         this.dirtyL = true; //flag to update localToWorld
         this.dirtyW = true; //flag to update worldToLocal
 
-        this.dispatchEvent(this.events.Update, this);
+        this.dispatchEvent(this.events.update, this);
     }
 
     p.getLocalToWorld = function () {
@@ -149,10 +151,10 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
 
     p.getWorldToLocal = function () {
         if(this.dirtyW === true){
-            glMatrix.mat4.invert(this.worldToLocal, this.localToWorld);
+            glMatrix.mat4.invert(this.worldToLocal, this.getLocalToWorld());
             this.dirtyW = false;
         }
-        return this.worldToLocal;      //if you made changes to transform, then this one should be updated.
+        return this.worldToLocal;
     }
 
     p.getPosition = function (out) {
@@ -207,7 +209,7 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
         this.dirtyL = true; //flag to update localToWorld
         this.dirtyW = true; //flag to update worldToLocal
 
-        this.dispatchEvent(this.events.Update, this);
+        this.dispatchEvent(this.events.update, this);
     }
 
     /*p.tick = function(){

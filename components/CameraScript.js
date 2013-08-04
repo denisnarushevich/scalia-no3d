@@ -118,7 +118,7 @@ define(['../engine/engine'], function (scalia) {
                 cameraScript.moveTo(transform);
             }
 
-            targetTransform.addEventListener(targetTransform.events.Update, this.onTargetUpdate);
+            targetTransform.addEventListener(targetTransform.events.update, this.onTargetUpdate);
         }
     }
 
@@ -128,7 +128,7 @@ define(['../engine/engine'], function (scalia) {
 
             this.target = null;
 
-            targetTransform.removeEventListener(targetTransform.events.Update, this.onTargetUpdate);
+            targetTransform.removeEventListener(targetTransform.events.update, this.onTargetUpdate);
         }
     }
 

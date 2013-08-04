@@ -84,7 +84,7 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
 
         var cam = this;
 
-        gameObject.transform.addEventListener(gameObject.transform.events.Update, function(){
+        gameObject.transform.addEventListener(gameObject.transform.events.update, function(){
 
             //update frustumbox
             var localToWorld = cam.gameObject.transform.getLocalToWorld();
@@ -98,7 +98,7 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
             cam.bounds.Calculate(cam.frustumBox);
 
 
-            cam.dispatchEvent(cam.events.Update);
+            cam.dispatchEvent(cam.events.update);
         });
     }
 
