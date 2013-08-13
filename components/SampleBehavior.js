@@ -4,11 +4,12 @@ define(['../engine/engine'], function(scalia){
     }
 
     SampleBehavior.prototype = Object.create(scalia.Component.prototype);
+    SampleBehavior.prototype.constructor = SampleBehavior;
 
     SampleBehavior.transform = null;
 
     SampleBehavior.prototype.start = function(){
-        this.transform = this.gameObject.getComponent(scalia.components.TransformComponent);
+        this.transform = this.gameObject.getComponent(scalia.TransformComponent);
     }
 
     SampleBehavior.prototype.tick = function(){

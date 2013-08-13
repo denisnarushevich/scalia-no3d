@@ -22,25 +22,27 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
 
     }
 
-    var p = CameraComponent.prototype = Object.create(Component.prototype);
+    CameraComponent.prototype = Object.create(Component.prototype);
 
-    p.size = null;
-    p.bounds = null;
-    p.frustumSize = null;
-    p.frustumBox = null;
-    p.projectionMatrix = null;
+    CameraComponent.prototype.constructor = CameraComponent;
 
-    p.worldToScreenMatrix = null;
-    p.worldToViewportMatrix = null;
+    CameraComponent.prototype.size = null;
+    CameraComponent.prototype.bounds = null;
+    CameraComponent.prototype.frustumSize = null;
+    CameraComponent.prototype.frustumBox = null;
+    CameraComponent.prototype.projectionMatrix = null;
+
+    CameraComponent.prototype.worldToScreenMatrix = null;
+    CameraComponent.prototype.worldToViewportMatrix = null;
 
     //p.backgroundPattern = null;
 
-    p.start = function(){
+    CameraComponent.prototype.start = function(){
         var cam = this;
         //glMatrix.mat4.mul(cam.worldToViewportMatrix, cam.projectionMatrix, cam.gameObject.transform.getWorldToLocal());
     }
 
-    p.setup = function(width, height, length){
+    CameraComponent.prototype.setup = function(width, height, length){
         //update sizes
         this.size = [width, height, length];
 
@@ -59,7 +61,7 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
         this.bounds.Calculate(this.frustumBox);
     }
 
-    p.setViewport = function(viewport){
+    CameraComponent.prototype.setViewport = function(viewport){
         this.viewport = viewport;
 
         this.setup(viewport.size[0], viewport.size[1], 100);
@@ -74,12 +76,12 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
         this.dispatchEvent(this.events.viewportSet, this);
     }
 
-    p.removeViewport = function(){
+    CameraComponent.prototype.removeViewport = function(){
         this.dispatchEvent(this.events.viewportRemoved, this);
         this.viewport = null;
     }
 
-    p.setGameObject = function(gameObject){
+    CameraComponent.prototype.setGameObject = function(gameObject){
         Component.prototype.setGameObject.call(this, gameObject);
 
         var cam = this;
@@ -102,15 +104,15 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
         });
     }
 
-    p.getWorldToScreen = function(){
+    CameraComponent.prototype.getWorldToScreen = function(){
         return glMatrix.mat4.mul(this.worldToScreenMatrix, this.viewport.viewportMatrix, this.worldToViewportMatrix);
     }
 
-    p.getWorldToViewport = function(){
+    CameraComponent.prototype.getWorldToViewport = function(){
         return this.worldToViewportMatrix;
     }
 
-    p.getScreenToWorld = function(){
+    CameraComponent.prototype.getScreenToWorld = function(){
         var a = [];
 
         console.log(glMatrix.mat4.invert(a, this.getWorldToViewport()));

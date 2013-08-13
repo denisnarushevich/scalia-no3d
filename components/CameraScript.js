@@ -7,7 +7,7 @@ define(['../engine/engine'], function (scalia) {
     }
 
     var cameraScript = CameraScript.prototype = Object.create(scalia.Component.prototype);
-
+    cameraScript.constructor = CameraScript;
     /**
      * @type {Transform}
      */
@@ -27,9 +27,9 @@ define(['../engine/engine'], function (scalia) {
      */
     CameraScript.prototype.awake = function () {
         this.gameObject.transform.rotate(30, 45, 0, "self");
-        this.gameObject.transform.translate(2000, 0, 2000, 'world');
+        this.gameObject.transform.translate(20000, 0, 20000, 'world');
 
-        var camera = this.gameObject.getComponent(scalia.components.CameraComponent),
+        var camera = this.gameObject.getComponent(scalia.CameraComponent),
             script = this;
 
         camera.addEventListener(camera.events.viewportSet, function (camera) {
@@ -140,7 +140,7 @@ define(['../engine/engine'], function (scalia) {
     cameraScript.pickTile = function (x, y) {
         var gameObjects = this.gameObject.world.retrieve(this.gameObject),
             gameObject,
-            camera = this.gameObject.getComponent(scalia.components.CameraComponent),
+            camera = this.gameObject.getComponent(scalia.CameraComponent),
             wTs = camera.getWorldToScreen(),
             wTv = camera.getWorldToViewport(),
             v1 = [], v2 = [];
@@ -153,12 +153,12 @@ define(['../engine/engine'], function (scalia) {
             gameObject.transform.getPosition(v1);
 
             //skip objects that lay outside of screen
-            scalia.gl.vec3.transformMat4(v2, v1, wTv);
+            scalia.glMatrix.vec3.transformMat4(v2, v1, wTv);
             if (Math.abs(v2[0]) > 1 || Math.abs(v2[1]) > 1)
                 continue;
 
-            scalia.gl.vec3.transformMat4(v2, v1, wTs);
-            var sprite = gameObject.getComponent(scalia.components.SpriteComponent);
+            scalia.glMatrix.vec3.transformMat4(v2, v1, wTs);
+            var sprite = gameObject.getComponent(scalia.SpriteComponent);
             if (sprite !== null) {
                 var x0 = v2[0] - sprite.pivot[0],
                     y0 = v2[1] - sprite.pivot[1],
@@ -170,7 +170,7 @@ define(['../engine/engine'], function (scalia) {
                         this.tmpctx.clearRect(0, 0, sprite.width, sprite.height);
                         this.tmpctx.drawImage(sprite.image, 0, 0);
                         if (this.tmpctx.getImageData(x - x0, y - y0, 1, 1).data[3] > 0) {
-                            this.gameObject.getComponent(scalia.components.CameraComponent).viewport.graphics.viewports[1].camera.getComponent(CameraScript).moveTo(gameObject.transform);
+                            this.gameObject.getComponent(scalia.CameraComponent).viewport.graphics.viewports[1].camera.getComponent(CameraScript).moveTo(gameObject.transform);
                         }
                     }
                 }

@@ -12,6 +12,14 @@ define([
         // Distance between tiles in 3D space can be calculated like this:
         // 1/cos(45)*TILE_WIDTH/2 = 45.255 , where 45deg angle is rotation about Y axis.
 
+        //Tile Z is amount of how much units tile should be elevated in one step by z axis.
+        //it's calculated: tileZStep = x/cos(30deg); where x is height of elevation step on image, in pixels,
+        //and 30deg angle - is pitch angle of camera
+
+        //config entries
+        Scalia.config["tileSize"] = 45.255;
+        Scalia.config["tileZStep"] = 9.238;
+
         //configure
         scaliaEngine.Layers.AddLayer();
         scaliaEngine.Layers.layers[0].depthSortingEnabled = false;
@@ -22,7 +30,7 @@ define([
 
 
         var isometrica = this;
-        Scalia.Assets.loadBatch(['./tile.png', './tile2.png', './green-ball-small.png', './dirt.jpg'], function () {
+        Scalia.Assets.loadBatch(['./grass.png', './water.png', './tree.png'], function () {
                 console.log('starting');
                 isometrica.start();
             },
@@ -53,28 +61,14 @@ define([
         this.game.Run();
 
 
-        var viewport = this.game.graphics.createViewport();
-        viewport.setCamera(mainScript.mainCamera);
-        document.body.appendChild(viewport.canvas);
-        viewport.setSize(viewport.canvas.offsetWidth, viewport.canvas.offsetHeight);
 
+        var viewport = this.game.graphics.createViewport(document.getElementById("mainCanvas"));
+        viewport.setCamera(mainScript.mainCamera).setSize(viewport.canvas.offsetWidth, viewport.canvas.offsetHeight);
 
-
-
-
-
-
-
+        /*
         var viewport2 = this.game.graphics.createViewport(document.getElementById("vpcnv"));
         viewport2.setCamera(mainScript.createCamera()).setSize(viewport2.canvas.offsetWidth, viewport2.canvas.offsetHeight);
-
-
-        var a = new Ball();
-        var b = new Ball();
-
-        a.transform.addChild(b.transform);
-
-        this.game.logic.world.addGameObject(a);
+        */
     }
 
     /**

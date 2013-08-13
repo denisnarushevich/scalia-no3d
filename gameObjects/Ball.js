@@ -2,7 +2,7 @@ define(["../engine/engine", '../components/SampleBehavior'], function (scalia, s
     function Ball() {
         scalia.GameObject.call(this);
 
-        var sprite = new scalia.components.SpriteComponent(this);
+        var sprite = new scalia.SpriteComponent(this);
 
         scalia.Assets.getAsset('./green-ball-small.png', function(image){
             sprite.image = image;

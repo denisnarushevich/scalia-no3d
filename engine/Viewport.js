@@ -1,4 +1,4 @@
-define(["./CanvasRenderer", './EventManager', './Layers'], function (CanvasRenderer, EventManager, Layers) {
+define(['./EventManager', './Layers'], function (EventManager, Layers) {
     /**
      * @param {Graphics} graphics
      * @param {HTMLCanvasElement} canvas @optional

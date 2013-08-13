@@ -5,8 +5,8 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
      * @param {GameObject} gameObject
      * @constructor
      */
-    function Transform(gameObject) {
-        Component.call(this, gameObject);
+    function Transform() {
+        Component.call(this);
 
         this.children = [];
 
@@ -43,6 +43,8 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
     var p = Transform.prototype = Object.create(Component.prototype),
         bufferVec3 = new Float32Array([0, 0, 0]),
         bufferMat4 = new Float32Array(16);
+
+    p.constructor = Transform;
 
     p.local = null;
 
@@ -86,11 +88,15 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
     p.setParent = function(parent){
         this.parent = parent;
         parent.addEventListener(parent.events.update, this.onParentUpdate);
+        this.dirtyL = true;
+        this.dirtyW = true;
     }
 
     p.removeParent = function(){
         this.parent.removeEventListener(parent.events.update, this.onParentUpdate);
         this.parent = null;
+        this.dirtyL = true;
+        this.dirtyW = true;
     }
 
     p.translate = function (x, y, z, relativeTo) {
@@ -141,7 +147,6 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
                 glMatrix.mat4.copy(this.localToWorld, this.local);
             } else {
                 glMatrix.mat4.multiply(this.localToWorld, this.parent.getLocalToWorld(), this.local)
-
             }
             this.dirtyL = false;
         }

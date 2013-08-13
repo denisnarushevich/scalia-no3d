@@ -1,4 +1,5 @@
 define([
+    './config',
     './Game',
     './GameObject',
     './Component',
@@ -9,21 +10,18 @@ define([
     './components/SpriteComponent',
     './lib/gl-matrix',
     './AssetManager'
-], function (Game, GameObject, Component, Layers, Camera, CameraComponent, TransformComponent, SpriteComponent, glMatrix, AssetManager) {
+], function (config, Game, GameObject, Component, Layers, Camera, CameraComponent, TransformComponent, SpriteComponent, glMatrix, AssetManager) {
     return window.scaliaEngine = {
+        config: config,
         Game: Game,
         GameObject: GameObject,
         Component: Component,
         Layers: Layers,
-        gameObjects: {
-            Camera: Camera
-        },
-        components: {
-            CameraComponent: CameraComponent,
-            TransformComponent: TransformComponent,
-            SpriteComponent: SpriteComponent
-        },
-        gl: glMatrix,
+        Camera: Camera,
+        CameraComponent: CameraComponent,
+        TransformComponent: TransformComponent,
+        SpriteComponent: SpriteComponent,
+        glMatrix: glMatrix,
         Assets: AssetManager
     };
 });

@@ -1,4 +1,4 @@
-define(['./Time', './World'], function (Time, World) {
+define(['./Time', './World', './config'], function (Time, World, config) {
     /**
      * @param {Game} game
      * @constructor
@@ -6,7 +6,7 @@ define(['./Time', './World'], function (Time, World) {
     function Logic(game) {
         this.game = game;
         this.time = new Time();
-        this.world = new World(this);
+        this.world = new World(this, config.useOctree || false);
     }
 
     var p = Logic.prototype;
@@ -39,7 +39,7 @@ define(['./Time', './World'], function (Time, World) {
         var frameTime = now - this.time.now,
             dt = this.time.dt;
 
-        while(frameTime >= dt && i < 5){
+        while(frameTime >= dt && i < 10){
             i++;
             frameTime -= dt;
             this.time.now += dt;

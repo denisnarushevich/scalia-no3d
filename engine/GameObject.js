@@ -6,7 +6,7 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
     function GameObject() {
         this.instanceId = GameObject.prototype.instanceId++;
         this.components = [];
-        this.addComponent(new Transform(this));
+        this.addComponent(new Transform());
     }
 
     var p = GameObject.prototype;
@@ -40,6 +40,8 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
      * @type {Camera}
      */
     p.camera = null;
+
+    p.sprite = null;
 
     /**
      * @type {Component[]}
@@ -89,6 +91,11 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
         component.setGameObject(this);
     }
 
+    /**
+     * Method will return component of type of given constructor function
+     * @param {function} Type
+     * @returns {*}
+     */
     p.getComponent = function(Type){
         for(var i = 0; i < this.components.length; i++){
             var component = this.components[i];

@@ -1,11 +1,11 @@
-define(["./Viewport", "./CanvasRenderer"], function (Viewport, CanvasRenderer) {
+define(["./Viewport", "./Canvas2dRenderer"], function (Viewport, Renderer) {
     /**
      * @constructor
      */
     function Graphics(game) {
         this.game = game;
         this.viewports = [];
-        this.renderer = new CanvasRenderer();
+        this.renderer = new Renderer();
     }
 
     var p = Graphics.prototype;
