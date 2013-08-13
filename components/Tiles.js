@@ -9,28 +9,48 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
     Tiles.prototype.constructor = Tiles;
 
     Tiles.prototype.mainCamera = null;
-    Tiles.prototype.chunkSize = 32;
+    Tiles.prototype.chunkSize = 24;
+    Tiles.prototype.currentChunkX = 0;
+    Tiles.prototype.currentChunkY = 0;
 
     Tiles.prototype.start = function () {
         //engine.Component.prototype.start.call(this); //calls parent start, which does nothing
         var self = this;
-        isometrica.server.on("tiledata", function (data) {
+
+        var onTileData = function (data) {
+            var t0 = Date.now();
+            //console.profile("Tiles.onTileData proccessing");
+
             for (var i = 0; i < data.length; i++) {
                 var item = data[i],
                     x = item.x,
                     y = item.y,
                     cX = (x / self.chunkSize) | 0,
                     cY = (y / self.chunkSize) | 0,
-                    chunk = self.getChunk(cX, cY);
+                    chunk = self.getChunk(cX, cY),
+                    tile;
 
-                var tile = new Tile(x, y);
+                if (chunk === false) {
+                    self.makeChunk(cX, cY)
+                    chunk = self.getChunk(cX, cY);
+                }
+
+                tile = new Tile(x, y);
+
                 chunk.setTile(tile);
 
                 var t = tile.getComponent(TileComponent);
                 t.tiles = self;
                 t.setData(item);
+
+                self.cleanChunks();
             }
-        });
+
+            //console.profileEnd();
+            var t1 = Date.now();
+
+            console.log("Tiles.onTileData proccessing time:", t1 - t0, "msec for", data.length, "tiles");
+        }
 
 
         var onCameraMove = function (transform) {
@@ -38,64 +58,45 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
                 cx = ((position[0] / engine.config.tileSize / self.chunkSize) | 0),
                 cy = ((position[2] / engine.config.tileSize / self.chunkSize) | 0);
 
-            var chunks = [];
-            for (var i = 0; i < 9; i++) {
-                var x = (i / 3) | 0,
-                    y = i - x * 3;
-                chunks.push([cx + x - 1, cy + y - 1])
+            if (self.currentChunkX !== cx || self.currentChunkY !== cy) {
+                self.currentChunkX = cx;
+                self.currentChunkY = cy;
+                self.loadChunks(cx, cy);
             }
-
-            self.loadChunks(chunks);
         };
 
         this.mainCamera.transform.addEventListener(this.mainCamera.transform.events.update, onCameraMove);
+        this.main.server.on(0, onTileData);
 
         onCameraMove(this.mainCamera.transform);
     }
 
-    Tiles.prototype.loadChunks = function (chunkXYs) {
+    /**
+     * Load 8 chunks around chunk where camera is focused. Skip already loaded.
+     * @param centerX
+     * @param centerY
+     */
+    Tiles.prototype.loadChunks = function (centerX, centerY) {
         var param = [];
-        for (var i = 0; i < chunkXYs.length; i++) {
 
-            var cx = chunkXYs[i][0],
-                cy = chunkXYs[i][1];
+        for (var i = 0; i < 9; i++) {
+            var x = (i / 3) | 0,
+                y = i - x * 3,
+                cx = centerX + x - 1,
+                cy = centerY + y - 1;
 
-            if (!this.getChunk(cx, cy)) {
-                if (this.makeChunk(cx, cy)) {
-                    param.push({
-                        x0: cx,
-                        y0: cy,
-                        w: this.chunkSize,
-                        h: this.chunkSize
-                    });
-                }
+            if (this.getChunk(cx, cy) === false && cx >= 0 && cy >= 0) {
+                param.push({
+                    x0: cx,
+                    y0: cy,
+                    w: this.chunkSize,
+                    h: this.chunkSize
+                });
             }
-
-
-        }
-
-        for (var x = 0; x < this.chunks.length; x++) {
-            if (this.chunks[x])
-                for (var y = 0; y < this.chunks[x].length; y++) {
-                    if (this.chunks[x][y]) {
-                        var skip = false;
-                        for (var i = 0; i < chunkXYs.length; i++) {
-                            if (x == chunkXYs[i][0] && y == chunkXYs[i][1]) {
-                                skip = true;
-                                break;
-                            }
-                        }
-                        if (skip)
-                            continue;
-
-                        this.chunks[x][y].destroy();
-                        delete this.chunks[x][y];
-                    }
-                }
         }
 
         if (param.length)
-            isometrica.server.emit("getchunks", param);
+            this.main.server.emit(0, param);
     }
 
     Tiles.prototype.makeChunk = function (cX, cY) {
@@ -119,6 +120,26 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
             return this.chunks[cX][cY].getComponent(ChunkComponent);
         }
         return false;
+    }
+
+    /**
+     * Remove old chunks around current position, remove those that are outside of 3x3 area of current chunks.
+     */
+    Tiles.prototype.cleanChunks = function () {
+        var chunks = this.chunks,
+            cx, cy;
+
+        for (cx = 0; cx < chunks.length; cx++) {
+            if (chunks[cx] === undefined)
+                continue;
+
+            for (cy = 0; cy < chunks[cx].length; cy++) {
+                if (chunks[cx][cy] !== undefined && (Math.abs(cx - this.currentChunkX) > 1 || Math.abs(cy - this.currentChunkY) > 1)) {
+                    chunks[cx][cy].destroy();
+                    delete chunks[cx][cy];
+                }
+            }
+        }
     }
 
     return Tiles;

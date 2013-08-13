@@ -160,8 +160,8 @@ define(['../engine/engine'], function (scalia) {
             scalia.glMatrix.vec3.transformMat4(v2, v1, wTs);
             var sprite = gameObject.getComponent(scalia.SpriteComponent);
             if (sprite !== null) {
-                var x0 = v2[0] - sprite.pivot[0],
-                    y0 = v2[1] - sprite.pivot[1],
+                var x0 = v2[0] - sprite.pivotX,
+                    y0 = v2[1] - sprite.pivotY,
                     x1 = x0 + sprite.width,
                     y1 = y0 + sprite.height;
 

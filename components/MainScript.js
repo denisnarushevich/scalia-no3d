@@ -1,4 +1,4 @@
-define(['../engine/engine', './CameraScript', './Tiles'], function (scalia, CameraScript, WorldStreamer) {
+define(['../engine/engine', './CameraScript', './Tiles', '../socket.io.min'], function (scalia, CameraScript, Tiles, io) {
     function MainScript() {
 
     }
@@ -7,9 +7,12 @@ define(['../engine/engine', './CameraScript', './Tiles'], function (scalia, Came
     MainScript.prototype.constructor = MainScript;
 
     MainScript.prototype.mainCamera = null;
+    MainScript.prototype.server = null;
 
     MainScript.prototype.start = function () {
         scalia.Component.prototype.start.call(this); //calls parent start, but does nothing
+
+        this.server = io.connect("192.168.1.102:91");
 
         this.mainCamera = new scaliaEngine.Camera();
         this.mainCamera.addComponent(new CameraScript());
@@ -20,9 +23,10 @@ define(['../engine/engine', './CameraScript', './Tiles'], function (scalia, Came
         this.gameObject.world.addGameObject(this.mainCamera);
 
 
-        var worldStreamer = new WorldStreamer();
-        this.gameObject.addComponent(worldStreamer);
-        worldStreamer.mainCamera = this.mainCamera;
+        var tiles = new Tiles();
+        this.gameObject.addComponent(tiles);
+        tiles.main = this;
+        tiles.mainCamera = this.mainCamera;
     }
 
     MainScript.prototype.createCamera = function () {
