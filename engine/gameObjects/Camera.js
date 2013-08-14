@@ -1,5 +1,5 @@
 define(["../GameObject", "../components/CameraComponent"], function (GameObject, CameraComponent) {
-    function CameraObject(width, height, length) {
+    function CameraObject() {
         GameObject.call(this);
         this.camera = this.addComponent(new CameraComponent());
     }

@@ -14,7 +14,7 @@ define([
     Tiles.prototype.constructor = Tiles;
 
     Tiles.prototype.mainCamera = null;
-    Tiles.prototype.chunkSize = 24;
+    Tiles.prototype.chunkSize = 32;
     Tiles.prototype.currentChunkX = 0;
     Tiles.prototype.currentChunkY = 0;
 

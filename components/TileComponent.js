@@ -18,13 +18,14 @@ define(['../engine/engine'], function (engine) {
 
     TileComponent.prototype.x = null;
     TileComponent.prototype.y = null;
+    TileComponent.prototype.z = null;
     TileComponent.prototype.gridPoints = null;
 
     TileComponent.prototype.start = function () {
         //var transform = this.gameObject.transform;
         //transform.translate(0,-(Math.random()*400+100),0);
-        if (this.x !== null && this.y !== null)
-            this.gameObject.transform.translate(this.x * engine.config.tileSize, 0, this.y * engine.config.tileSize, "world");
+       // if (this.x !== null && this.y !== null)
+           // this.gameObject.transform.translate(this.x * engine.config.tileSize, 0, this.y * engine.config.tileSize, "world");
 
         /*
          var sprite = this.gameObject.sprite;
@@ -86,6 +87,8 @@ define(['../engine/engine'], function (engine) {
 
         //if not water
         if (data.type !== 0) {
+            this.z = data.gridPoints[2][2];
+
             if (data.objects.length > 0) {
                 var objects = data.objects,
                     len = objects.length,
@@ -97,11 +100,12 @@ define(['../engine/engine'], function (engine) {
 
                     obj = new Obj();
                     transform.addChild(obj.transform);
-                    obj.transform.translate(objData.subX * engine.config.tileSize, 0, objData.subY * engine.config.tileSize);
+                    //obj.transform.translate(objData.subX * engine.config.tileSize, 0, objData.subY * engine.config.tileSize);
+                    //TODO: Y value should be interpolated from gridpoints
+                    obj.transform.setLocalPosition(objData.subX * engine.config.tileSize, 0, objData.subY * engine.config.tileSize);
+
                 }
             }
-
-            transform.translate(0, data.gridPoints[2][2] * engine.config.tileZStep, 0, "world");
 
             engine.Assets.getAsset('./grass.png', function (image) {
                 sprite.image = image;
@@ -113,6 +117,8 @@ define(['../engine/engine'], function (engine) {
                 sprite.offsetY = clips[self.getSlopeId().toString()][1];
             });
         } else {
+            this.z = 0; //WATERLEVEL!!!
+
             engine.Assets.getAsset("./water.png", function (image) {
                 sprite.image = image;
                 sprite.pivotX = 32;
@@ -121,6 +127,13 @@ define(['../engine/engine'], function (engine) {
                 sprite.height = 47;
             });
         }
+
+
+        transform.setPosition(
+            this.x * engine.config.tileSize,
+            this.z * engine.config.tileZStep,
+            this.y * engine.config.tileSize
+        );
 
 
         this.dispatchEvent(this.events.dataSet, this);

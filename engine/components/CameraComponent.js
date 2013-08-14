@@ -64,11 +64,11 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
     CameraComponent.prototype.setViewport = function(viewport){
         this.viewport = viewport;
 
-        this.setup(viewport.size[0], viewport.size[1], 100);
+        this.setup(viewport.width, viewport.height, 100);
 
         var cam = this;
         this.viewport.addEventListener(this.viewport.events.resize, function(viewport){
-            cam.setup(viewport.size[0], viewport.size[1], 100);
+            cam.setup(viewport.width, viewport.height, 100);
 
             glMatrix.mat4.mul(cam.worldToViewportMatrix, cam.projectionMatrix, cam.gameObject.transform.getWorldToLocal());
         });
@@ -113,10 +113,7 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
     }
 
     CameraComponent.prototype.getScreenToWorld = function(){
-        var a = [];
-
-        console.log(glMatrix.mat4.invert(a, this.getWorldToViewport()));
-        return a;
+        throw "CameraComponent.getScreenToWorld: not implemented";
     }
 
     return CameraComponent;

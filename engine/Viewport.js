@@ -19,7 +19,8 @@ define(['./EventManager', './Layers'], function (EventManager, Layers) {
         this.canvas = canvas || document.createElement('canvas');
         this.context = this.canvas.getContext("2d");
         this.graphics = graphics;
-        this.size = [0,0];
+        this.width = 0;
+        this.height = 0;
 
         this.viewportMatrix = new Float32Array(16);
 
@@ -83,6 +84,9 @@ define(['./EventManager', './Layers'], function (EventManager, Layers) {
      */
     p.size = null;
 
+    p.width = null;
+    p.height = null;
+
     /**
      * 4x4 viewport matrix
      * @type {Array}
@@ -121,8 +125,8 @@ define(['./EventManager', './Layers'], function (EventManager, Layers) {
      * @constructor
      */
     p.setSize = function (width, height) {
-        this.size[0] = width;
-        this.size[1] = height;
+        this.width = width;
+        this.height = height;
 
         this.canvas.width = width;
         this.canvas.height = height;

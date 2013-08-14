@@ -1,7 +1,8 @@
 define([
     './engine/engine',
     './components/MainScript',
-], function (engine, MainScript) {
+    "./gameObjects/Tree1"
+], function (engine, MainScript, Tree1) {
     function Isometrica() {
         // Isometrica is not trully isometric, it's dimetric with 2:1 ratio (Transport Tycoon used this).
         // It means, that when point goes about 1px by X, it moves 1/2 pixel by Y.
@@ -57,6 +58,12 @@ define([
         var viewport2 = this.game.graphics.createViewport(document.getElementById("vpcnv"));
         viewport2.setCamera(mainScript.createCamera()).setSize(viewport2.canvas.offsetWidth, viewport2.canvas.offsetHeight);
         */
+
+      /*  t1 = new Tree1();
+        this.game.logic.world.addGameObject(t1);
+        t2 = new Tree1();
+        t2.transform.translate(100,0,100);
+        t1.transform.addChild(t2.transform);*/
     }
 
     /**

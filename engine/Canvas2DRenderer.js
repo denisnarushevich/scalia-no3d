@@ -12,8 +12,6 @@ define(["./config","./lib/gl-matrix", "./Layers"], function (config, glMatrix, L
         bufferMat4 = new Float32Array(16);
 
     p.screenSpaceCulling = function (gameObject, viewport) {
-        var transform = gameObject.transform;
-
         //primitive culling
         if (gameObject.sprite !== undefined && gameObject.sprite !== null) {
             gameObject.transform.getPosition(bufferVec3);
@@ -22,11 +20,7 @@ define(["./config","./lib/gl-matrix", "./Layers"], function (config, glMatrix, L
             bufferVec3[0] -= gameObject.sprite.pivotX;
             bufferVec3[1] -= gameObject.sprite.pivotY;
 
-
-
-
-            if (bufferVec3[0] > viewport.size[0] || bufferVec3[0] + sprite.width < 0 || bufferVec3[1] > viewport.size[1] || bufferVec3[1] + sprite.height < 0) {
-
+            if (bufferVec3[0] > viewport.width || bufferVec3[0] + sprite.width < 0 || bufferVec3[1] > viewport.height || bufferVec3[1] + sprite.height < 0) {
 
             } else {
                 this.layerBuffers[gameObject.layer].push(gameObject);
@@ -43,7 +37,7 @@ define(["./config","./lib/gl-matrix", "./Layers"], function (config, glMatrix, L
         this.M = camera.camera.getWorldToScreen();
 
 
-        viewport.context.clearRect(0, 0, viewport.size[0], viewport.size[1]);
+        viewport.context.clearRect(0, 0, viewport.width, viewport.height);
 
         for (i = 0; i < gameObjectsCount; i++)
             this.screenSpaceCulling(gameObjects[i], viewport);

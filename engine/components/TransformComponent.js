@@ -10,26 +10,26 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
 
         this.children = [];
 
-        this.local = [
+        this.local = new Float32Array([
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1
-        ];
+        ]);
 
-        this.localToWorld = [
+        this.localToWorld = new Float32Array([
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1
-        ];
+        ]);
 
-        this.worldToLocal = [
+        this.worldToLocal = new Float32Array([
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1
-        ];
+        ]);
 
         //When parent updates, our coords changes
         //so let's set flag to update out matrices
@@ -210,12 +210,24 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
 
         //transform given world position into local position
         if (this.parent !== null)
-            glMatrix.vec3.transformMat4(bufferVec3, bufferVec3, this.getWorldToLocal());
+            glMatrix.vec3.transformMat4(bufferVec3, bufferVec3, this.parent.getWorldToLocal());
 
         //set local position for local transform
         this.local[12] = bufferVec3[0];
         this.local[13] = bufferVec3[1];
         this.local[14] = bufferVec3[2];
+
+        this.dirtyL = true; //flag to update localToWorld
+        this.dirtyW = true; //flag to update worldToLocal
+
+        this.dispatchEvent(this.events.update, this);
+    }
+
+    p.setLocalPosition = function(x, y, z){
+        //set local position for local transform
+        this.local[12] = x;
+        this.local[13] = y;
+        this.local[14] = z;
 
         this.dirtyL = true; //flag to update localToWorld
         this.dirtyW = true; //flag to update worldToLocal
