@@ -1,4 +1,4 @@
-define(['../engine/engine', '../gameObjects/Tree'], function (engine, Tree) {
+define(['../engine/engine'], function (engine) {
     function TileComponent(x, y) {
         engine.Component.call(this);
         this.events = {
@@ -26,15 +26,15 @@ define(['../engine/engine', '../gameObjects/Tree'], function (engine, Tree) {
         if (this.x !== null && this.y !== null)
             this.gameObject.transform.translate(this.x * engine.config.tileSize, 0, this.y * engine.config.tileSize, "world");
 
-                     /*
-        var sprite = this.gameObject.sprite;
-        engine.Assets.getAsset('./grass.png', function (image) {
-            sprite.image = image;
-            sprite.width = 64;
-            sprite.height = 47;
-            sprite.pivotX = 32;
-            sprite.pivotY = 24;
-        });        */
+        /*
+         var sprite = this.gameObject.sprite;
+         engine.Assets.getAsset('./grass.png', function (image) {
+         sprite.image = image;
+         sprite.width = 64;
+         sprite.height = 47;
+         sprite.pivotX = 32;
+         sprite.pivotY = 24;
+         });        */
     }
 
     var clips = {
@@ -73,8 +73,9 @@ define(['../engine/engine', '../gameObjects/Tree'], function (engine, Tree) {
      */
     TileComponent.prototype.setData = function (data) {
         var self = this,
-            sprite = this.gameObject.sprite,
-            transform = this.gameObject.transform;
+            gameObject = this.gameObject,
+            sprite = gameObject.sprite,
+            transform = gameObject.transform;
 
         this.data = data;
 
@@ -85,11 +86,19 @@ define(['../engine/engine', '../gameObjects/Tree'], function (engine, Tree) {
 
         //if not water
         if (data.type !== 0) {
-            if (data.objects[0] !== undefined) {
-                var ball = new Tree();
-                this.gameObject.transform.addChild(ball.transform);
-                this.gameObject.world.addGameObject(ball);
-                ball.transform.translate(data.objects[0].subX * engine.config.tileSize, 0, data.objects[0].subY * engine.config.tileSize);
+            if (data.objects.length > 0) {
+                var objects = data.objects,
+                    len = objects.length,
+                    objData, obj, Obj;
+
+                for (var i = 0; i < len; i++) {
+                    objData = objects[i];
+                    Obj = this.tiles.main.worldObjects.getObjectById(objData.id);
+
+                    obj = new Obj();
+                    transform.addChild(obj.transform);
+                    obj.transform.translate(objData.subX * engine.config.tileSize, 0, objData.subY * engine.config.tileSize);
+                }
             }
 
             transform.translate(0, data.gridPoints[2][2] * engine.config.tileZStep, 0, "world");
@@ -103,7 +112,7 @@ define(['../engine/engine', '../gameObjects/Tree'], function (engine, Tree) {
                 sprite.offsetX = clips[self.getSlopeId().toString()][0];
                 sprite.offsetY = clips[self.getSlopeId().toString()][1];
             });
-        }else {
+        } else {
             engine.Assets.getAsset("./water.png", function (image) {
                 sprite.image = image;
                 sprite.pivotX = 32;
@@ -112,7 +121,6 @@ define(['../engine/engine', '../gameObjects/Tree'], function (engine, Tree) {
                 sprite.height = 47;
             });
         }
-
 
 
         this.dispatchEvent(this.events.dataSet, this);

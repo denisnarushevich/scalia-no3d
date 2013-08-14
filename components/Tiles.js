@@ -1,4 +1,9 @@
-define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComponent', '../gameObjects/Chunk', '../components/ChunkComponent'], function (engine, CameraScript, Tile, TileComponent, Chunk, ChunkComponent) {
+define([
+    '../engine/engine',
+    '../gameObjects/Tile',
+    '../lib/operation_codes',
+    '../lib/response_codes'
+], function (engine, Tile, operationCodes, responseCodes) {
     function Tiles() {
         this.chunks = [];
     }
@@ -37,9 +42,9 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
 
                 tile = new Tile(x, y);
 
-                chunk.setTile(tile);
+                chunk.transform.addChild(tile.transform);
 
-                var t = tile.getComponent(TileComponent);
+                var t = tile.tileComponent;
                 t.tiles = self;
                 t.setData(item);
 
@@ -66,7 +71,7 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
         };
 
         this.mainCamera.transform.addEventListener(this.mainCamera.transform.events.update, onCameraMove);
-        this.main.server.on(0, onTileData);
+        this.main.server.on(responseCodes.tileData, onTileData);
 
         onCameraMove(this.mainCamera.transform);
     }
@@ -96,7 +101,7 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
         }
 
         if (param.length)
-            this.main.server.emit(0, param);
+            this.main.server.emit(operationCodes.getChunks, param);
     }
 
     Tiles.prototype.makeChunk = function (cX, cY) {
@@ -106,7 +111,7 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
             if (this.chunks[cX] == undefined)
                 this.chunks[cX] = [];
 
-            chunk = this.chunks[cX][cY] = new Chunk(cX, cY);
+            chunk = this.chunks[cX][cY] = new engine.GameObject();
 
             this.gameObject.world.addGameObject(chunk);
 
@@ -117,7 +122,7 @@ define(['../engine/engine', './CameraScript', '../gameObjects/Tile', './TileComp
 
     Tiles.prototype.getChunk = function (cX, cY) {
         if (cX >= 0 && cY >= 0 && this.chunks[cX] !== undefined && this.chunks[cX][cY] !== undefined) {
-            return this.chunks[cX][cY].getComponent(ChunkComponent);
+            return this.chunks[cX][cY];
         }
         return false;
     }

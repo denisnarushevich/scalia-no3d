@@ -6,7 +6,7 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
     function GameObject() {
         this.instanceId = GameObject.prototype.instanceId++;
         this.components = [];
-        this.addComponent(new Transform());
+        this.transform = this.addComponent(new Transform());
     }
 
     var p = GameObject.prototype;
@@ -34,14 +34,6 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
      * @type {Transform}
      */
     p.transform = null;
-
-    /**
-     * Camera component attached to this game object.
-     * @type {Camera}
-     */
-    p.camera = null;
-
-    p.sprite = null;
 
     /**
      * @type {Component[]}
@@ -78,17 +70,11 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
      * @return {*}
      */
     p.addComponent = function(component){
-        if(component instanceof Transform){
-            this.transform = component;
-        }else if(component instanceof Camera){
-            this.camera = component;
-        }else if(component instanceof Sprite){
-            this.sprite = component;
-        }
-
         this.components[this.componentsCount++] = component;
 
         component.setGameObject(this);
+
+        return component;
     }
 
     /**
@@ -114,6 +100,7 @@ define(['./components/TransformComponent', './components/CameraComponent', "./co
 
     p.destroy = function(){
         this.world.removeGameObject(this);
+        this.world = null;
     }
 
     return GameObject;

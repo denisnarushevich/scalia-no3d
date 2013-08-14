@@ -1,4 +1,4 @@
-define(['../engine/engine', './CameraScript', './Tiles', '../socket.io.min'], function (scalia, CameraScript, Tiles, io) {
+define(['../engine/engine', './CameraScript', './Tiles', './WorldObjects','../socket.io.min'], function (scalia, CameraScript, Tiles, WorldObjects, io) {
     function MainScript() {
 
     }
@@ -24,9 +24,13 @@ define(['../engine/engine', './CameraScript', './Tiles', '../socket.io.min'], fu
 
 
         var tiles = new Tiles();
-        this.gameObject.addComponent(tiles);
+        this.tiles = this.gameObject.addComponent(tiles);
         tiles.main = this;
         tiles.mainCamera = this.mainCamera;
+
+        var objects = new WorldObjects();
+        this.worldObjects = this.gameObject.addComponent(objects);
+        objects.main = this;
     }
 
     MainScript.prototype.createCamera = function () {

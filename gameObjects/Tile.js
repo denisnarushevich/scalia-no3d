@@ -2,8 +2,8 @@ define(["../engine/engine", '../components/TileComponent'], function (engine, Ti
     function Tile(x, y) {
         engine.GameObject.call(this);
 
-        this.addComponent(new engine.SpriteComponent(this));
-        this.addComponent(new TileComponent(x, y));
+        this.sprite = this.addComponent(new engine.SpriteComponent(this));
+        this.tileComponent = this.addComponent(new TileComponent(x, y));
     }
 
     Tile.prototype = Object.create(engine.GameObject.prototype);

@@ -70,8 +70,8 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
      * @param {Transform} children
      */
     p.addChild = function (child) {
-        child.setParent(this);
         this.children[this.children.length] = child;
+        child.setParent(this);
     }
 
     /**
@@ -87,7 +87,13 @@ define(["../Component", "../lib/gl-matrix"], function (Component, glMatrix) {
      */
     p.setParent = function(parent){
         this.parent = parent;
+
         parent.addEventListener(parent.events.update, this.onParentUpdate);
+
+        //if parent's gameObject is already added to scene, then add ourselves too
+        if(parent.gameObject.world !== null)
+            parent.gameObject.world.addGameObject(this.gameObject);
+
         this.dirtyL = true;
         this.dirtyW = true;
     }

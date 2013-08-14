@@ -1,7 +1,7 @@
 define([
     './engine/engine',
     './components/MainScript',
-], function (Scalia, MainScript) {
+], function (engine, MainScript) {
     function Isometrica() {
         // Isometrica is not trully isometric, it's dimetric with 2:1 ratio (Transport Tycoon used this).
         // It means, that when point goes about 1px by X, it moves 1/2 pixel by Y.
@@ -15,20 +15,20 @@ define([
         //and 30deg angle - is pitch angle of camera
 
         //config entries
-        Scalia.config["tileSize"] = 45.255;
-        Scalia.config["tileZStep"] = 9.238;
+        engine.config["tileSize"] = 45.255;
+        engine.config["tileZStep"] = 9.238;
 
         //configure
-        scaliaEngine.Layers.AddLayer();
-        scaliaEngine.Layers.layers[0].depthSortingEnabled = false;
+        engine.Layers.AddLayer();
+        engine.Layers.layers[0].depthSortingEnabled = false;
 
         //init engine
-        this.game = new Scalia.Game();
+        this.game = new engine.Game();
 
 
 
         var isometrica = this;
-        Scalia.Assets.loadBatch(['./grass.png', './water.png', './tree.png'], function () {
+        engine.Assets.loadBatch(['./grass.png', './water.png', './tree.png'], function () {
                 console.log('starting');
                 isometrica.start();
             },
@@ -39,7 +39,7 @@ define([
     }
 
     Isometrica.prototype.start = function () {
-        var gameSystem = new scaliaEngine.GameObject();
+        var gameSystem = new engine.GameObject();
         var mainScript = new MainScript();
         gameSystem.addComponent(mainScript);
         this.game.logic.world.addGameObject(gameSystem);
@@ -60,7 +60,7 @@ define([
     }
 
     /**
-     * Scalia.Game instance
+     * engine.Game instance
      * @type {Game}
      */
     Isometrica.prototype.game = null;

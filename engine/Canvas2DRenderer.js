@@ -11,11 +11,11 @@ define(["./config","./lib/gl-matrix", "./Layers"], function (config, glMatrix, L
         buffer2Vec3 = new Float32Array([0, 0, 0]),
         bufferMat4 = new Float32Array(16);
 
-    p.F = function (gameObject, viewport) {
+    p.screenSpaceCulling = function (gameObject, viewport) {
         var transform = gameObject.transform;
 
         //primitive culling
-        if (gameObject.sprite !== null) {
+        if (gameObject.sprite !== undefined && gameObject.sprite !== null) {
             gameObject.transform.getPosition(bufferVec3);
             glMatrix.vec3.transformMat4(bufferVec3, bufferVec3, this.M);
             var sprite = gameObject.sprite;
@@ -46,7 +46,7 @@ define(["./config","./lib/gl-matrix", "./Layers"], function (config, glMatrix, L
         viewport.context.clearRect(0, 0, viewport.size[0], viewport.size[1]);
 
         for (i = 0; i < gameObjectsCount; i++)
-            this.F(gameObjects[i], viewport);
+            this.screenSpaceCulling(gameObjects[i], viewport);
 
         for (i = 0; i < layersCount; i++) {
             layer = Layers.layers[i];
