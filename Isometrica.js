@@ -1,8 +1,8 @@
 define([
     './engine/engine',
     './components/MainScript',
-    "./gameObjects/Tree1"
-], function (engine, MainScript, Tree1) {
+    "./gameObjects/Trolley"
+], function (engine, MainScript, Trolley) {
     function Isometrica() {
         // Isometrica is not trully isometric, it's dimetric with 2:1 ratio (Transport Tycoon used this).
         // It means, that when point goes about 1px by X, it moves 1/2 pixel by Y.
@@ -64,6 +64,13 @@ define([
         t2 = new Tree1();
         t2.transform.translate(100,0,100);
         t1.transform.addChild(t2.transform);*/
+
+
+        for(var i = 0; i < 3;i++){
+        t = new Trolley();
+        this.game.logic.world.addGameObject(t);
+        t.transform.setPosition(20000,0,20000)
+        }
     }
 
     /**

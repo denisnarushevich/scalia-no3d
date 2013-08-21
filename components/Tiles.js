@@ -14,7 +14,7 @@ define([
     Tiles.prototype.constructor = Tiles;
 
     Tiles.prototype.mainCamera = null;
-    Tiles.prototype.chunkSize = 32;
+    Tiles.prototype.chunkSize = 24;
     Tiles.prototype.currentChunkX = 0;
     Tiles.prototype.currentChunkY = 0;
 
@@ -35,10 +35,11 @@ define([
                     chunk = self.getChunk(cX, cY),
                     tile;
 
-                if (chunk === false) {
-                    self.makeChunk(cX, cY)
-                    chunk = self.getChunk(cX, cY);
-                }
+                //this tile is late, camera moved to another chunk
+                //and current chunk seems to be deleted.
+                //what a waste of traffic.
+                if (chunk === false)
+                    continue;
 
                 tile = new Tile(x, y);
 
@@ -97,6 +98,8 @@ define([
                     w: this.chunkSize,
                     h: this.chunkSize
                 });
+                this.makeChunk(cx, cy);
+                console.log(cx,cy);
             }
         }
 
