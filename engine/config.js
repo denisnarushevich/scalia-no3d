@@ -1,5 +1,5 @@
 define({
-    depthSortingMask: 0,
+    depthSortingMask: 1,
     layersCount: 1,
     useOctree: false,
     renderOctree: true
