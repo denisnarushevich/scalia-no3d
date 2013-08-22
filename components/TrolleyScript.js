@@ -1,4 +1,4 @@
-define(['../engine/engine'], function (engine) {
+define(['../engine'], function (engine) {
     function Script() {
         this.direction = new Int8Array(2);
     }

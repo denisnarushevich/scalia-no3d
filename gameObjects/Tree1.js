@@ -1,8 +1,9 @@
-define(["../engine/engine"], function (engine) {
+define(["../engine"], function (engine) {
     function Tree() {
         engine.GameObject.call(this);
 
         var sprite = this.sprite = new engine.SpriteComponent(this);
+        sprite.layer = 1;
 
         engine.Assets.getAsset('./tree.png', function (image) {
             sprite.image = image;
@@ -14,7 +15,6 @@ define(["../engine/engine"], function (engine) {
 
         this.addComponent(sprite);
 
-        this.layer = 1;
     }
 
     Tree.prototype = Object.create(engine.GameObject.prototype);

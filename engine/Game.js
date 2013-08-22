@@ -34,23 +34,23 @@ define(["./Logic", "./Graphics"], function (Logic, Graphics) {
     /**
      * @type {void}
      */
-    p.Run = function () {
+    p.run = function () {
         this.logic.start();
         this.graphics.start();
-        this.MainLoop();
+        this.mainLoop();
     }
 
     /**
      * @type {void}
      */
-    p.MainLoop = function () {
+    p.mainLoop = function () {
         this.logic.tick();
 
         this.graphics.render();
 
         var game = this;
         requestAnimFrame(function () {
-            game.MainLoop();
+            game.mainLoop();
         });
     }
 

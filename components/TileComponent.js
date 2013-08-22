@@ -1,4 +1,4 @@
-define(['../engine/engine'], function (engine) {
+define(['../engine'], function (engine) {
     function TileComponent(x, y) {
         engine.Component.call(this);
         this.events = {

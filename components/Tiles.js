@@ -1,5 +1,5 @@
 define([
-    '../engine/engine',
+    '../engine',
     '../gameObjects/Tile',
     '../lib/operation_codes',
     '../lib/response_codes'

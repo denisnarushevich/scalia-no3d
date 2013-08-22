@@ -1,5 +1,5 @@
 define([
-    './engine/engine',
+    './engine',
     './components/MainScript',
     "./gameObjects/Trolley"
 ], function (engine, MainScript, Trolley) {
@@ -15,16 +15,19 @@ define([
         //it's calculated: tileZStep = x/cos(30deg); where x is height of elevation step on image, in pixels,
         //and 30deg angle - is pitch angle of camera
 
-        //config entries
+
+
+        //custom config entries
         engine.config["tileSize"] = 45.255;
         engine.config["tileZStep"] = 9.238;
 
         //configure
-        engine.Layers.AddLayer();
-        engine.Layers.layers[0].depthSortingEnabled = false;
+        engine.config.layersCount = 2;
+        engine.config.depthSortingMask = 2;
 
         //init engine
         this.game = new engine.Game();
+
 
 
 
@@ -47,7 +50,7 @@ define([
 
 
 
-        this.game.Run();
+        this.game.run();
 
 
 

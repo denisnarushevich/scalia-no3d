@@ -1,4 +1,4 @@
-define(['./EventManager', './Layers'], function (EventManager, Layers) {
+define(['./EventManager', './config'], function (EventManager, config) {
     /**
      * @param {Graphics} graphics
      * @param {HTMLCanvasElement} canvas @optional
@@ -18,6 +18,8 @@ define(['./EventManager', './Layers'], function (EventManager, Layers) {
 
         this.canvas = canvas || document.createElement('canvas');
         this.context = this.canvas.getContext("2d");
+        this.context.imageSmoothingEnabled = false;
+        this.context.webkitImageSmoothingEnabled = false;
         this.graphics = graphics;
         this.width = 0;
         this.height = 0;
@@ -26,9 +28,11 @@ define(['./EventManager', './Layers'], function (EventManager, Layers) {
 
         //generate layers
         this.layers = [];
-        for (var i = 0; i < Layers.layers.length; i++) {
+        for (var i = 0; i < config.layersCount; i++) {
             var cnv = document.createElement("canvas");
             this.layers[i] = cnv.getContext("2d");
+            this.layers[i].imageSmoothingEnabled = false;
+            this.layers[i].webkitImageSmoothingEnabled = false;
         }
 
         var viewport = this;
@@ -117,7 +121,7 @@ define(['./EventManager', './Layers'], function (EventManager, Layers) {
      */
     p.render = function () {
         if(this.camera !== null)
-            this.graphics.renderer.Render(this.camera, this);
+            this.graphics.renderer.render(this.camera, this);
     }
 
     /**

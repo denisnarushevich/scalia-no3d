@@ -1,5 +1,5 @@
 define([
-    "../engine/engine",
+    "../engine",
     "../gameObjects/Tree1",
     "../gameObjects/Tree2"
 ], function(engine, Tree1, Tree2){

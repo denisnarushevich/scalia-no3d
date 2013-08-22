@@ -1,4 +1,4 @@
-define(["../engine/engine", '../components/TileComponent'], function (engine, TileComponent) {
+define(["../engine", '../components/TileComponent'], function (engine, TileComponent) {
     function Tile(x, y) {
         engine.GameObject.call(this);
 

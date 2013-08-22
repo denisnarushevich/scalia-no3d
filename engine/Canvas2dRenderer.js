@@ -1,7 +1,8 @@
-define(["./config","./lib/gl-matrix", "./Layers"], function (config, glMatrix, Layers) {
-    function Canvas2dRenderer() {
+define(["./config","./lib/gl-matrix"], function (config, glMatrix) {
+    function Canvas2dRenderer(graphics) {
+        this.graphics = graphics;
         this.layerBuffers = [];
-        for (i = 0; i < Layers.layers.length; i++)
+        for (var i = 0; i < config.layersCount; i++)
             this.layerBuffers[i] = [];
         this.M = [];
     }
@@ -11,31 +12,38 @@ define(["./config","./lib/gl-matrix", "./Layers"], function (config, glMatrix, L
         buffer2Vec3 = new Float32Array([0, 0, 0]),
         bufferMat4 = new Float32Array(16);
 
+    p.graphics = null;
+
     p.screenSpaceCulling = function (gameObject, viewport) {
         //primitive culling
         if (gameObject.sprite !== undefined && gameObject.sprite !== null) {
             gameObject.transform.getPosition(bufferVec3);
             glMatrix.vec3.transformMat4(bufferVec3, bufferVec3, this.M);
             var sprite = gameObject.sprite;
-            bufferVec3[0] -= gameObject.sprite.pivotX;
-            bufferVec3[1] -= gameObject.sprite.pivotY;
+            bufferVec3[0] -= sprite.pivotX;
+            bufferVec3[1] -= sprite.pivotY;
 
             if (bufferVec3[0] > viewport.width || bufferVec3[0] + sprite.width < 0 || bufferVec3[1] > viewport.height || bufferVec3[1] + sprite.height < 0) {
 
             } else {
-                this.layerBuffers[gameObject.layer].push(gameObject);
+                this.layerBuffers[sprite.layer].push(gameObject);
             }
         }
     }
 
-    p.Render = function (camera, viewport) {
+    p.render = function (camera, viewport) {
         var gameObjects = camera.world.retrieve(camera),
             gameObjectsCount = gameObjects.length,
-            layersCount = viewport.layers.length,
-            gameObject, i, j, layer, ctx;
+            layersCount = config.layersCount,
+            gameObject, i, j, ctx;
 
         this.M = camera.camera.getWorldToScreen();
 
+
+        //1.do culling
+        //2.opredelitj Z index. kakoj sloj pervim
+        //3.risovatj na4inaja s samogo malenjkogo Z
+        //3.4. risuja sortirovatj
 
         viewport.context.clearRect(0, 0, viewport.width, viewport.height);
 
@@ -43,13 +51,12 @@ define(["./config","./lib/gl-matrix", "./Layers"], function (config, glMatrix, L
             this.screenSpaceCulling(gameObjects[i], viewport);
 
         for (i = 0; i < layersCount; i++) {
-            layer = Layers.layers[i];
             ctx = viewport.layers[i];
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             gameObjects = this.layerBuffers[i];
             gameObjectsCount = gameObjects.length;
 
-            if (layer.depthSortingEnabled === true) {
+            if (config.depthSortingMask & (1 << i)) {
                 gameObjects.sort(function (a, b) {
                     a.transform.getPosition(bufferVec3);
                     a = bufferVec3[0] + bufferVec3[1] + bufferVec3[2];

@@ -5,7 +5,7 @@ define(["./Viewport", "./Canvas2dRenderer"], function (Viewport, Renderer) {
     function Graphics(game) {
         this.game = game;
         this.viewports = [];
-        this.renderer = new Renderer();
+        this.renderer = new Renderer(this);
     }
 
     var p = Graphics.prototype;

@@ -1,8 +1,9 @@
-define(["../engine/engine", "../components/TrolleyScript"], function (engine, TrolleyScript) {
-    function Trolley(x, y) {
+define(["../engine", "../components/TrolleyScript"], function (engine, TrolleyScript) {
+    function Trolley() {
         engine.GameObject.call(this);
 
         var sprite = this.sprite = this.addComponent(new engine.SpriteComponent(this));
+        sprite.layer = 1;
 
         engine.Assets.getAsset('./trolley.png', function (image) {
             sprite.image = image;
@@ -16,7 +17,7 @@ define(["../engine/engine", "../components/TrolleyScript"], function (engine, Tr
 
 
 
-        this.layer = 1;
+
     }
 
     Trolley.prototype = Object.create(engine.GameObject.prototype);

@@ -1,4 +1,4 @@
-define(['../engine/engine', './CameraScript', './Tiles', './WorldObjects','../socket.io.min'], function (scalia, CameraScript, Tiles, WorldObjects, io) {
+define(['../engine', './CameraScript', './Tiles', './WorldObjects','../socket.io.min'], function (scalia, CameraScript, Tiles, WorldObjects, io) {
     function MainScript() {
 
     }
@@ -12,7 +12,7 @@ define(['../engine/engine', './CameraScript', './Tiles', './WorldObjects','../so
     MainScript.prototype.start = function () {
         scalia.Component.prototype.start.call(this); //calls parent start, but does nothing
 
-        this.server = io.connect("192.168.1.102:91");
+        this.server = io.connect("127.0.0.1:1337");
 
         this.mainCamera = new scaliaEngine.Camera();
         this.mainCamera.addComponent(new CameraScript());

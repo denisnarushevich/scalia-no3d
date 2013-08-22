@@ -22,5 +22,7 @@ define(["../Component"], function (Component) {
     p.offsetX = 0;
     p.offsetY = 0;
 
+    p.layer = 0;
+
     return Sprite;
 });

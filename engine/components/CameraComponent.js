@@ -6,7 +6,6 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
     function CameraComponent(){
         Component.call(this);
         this.projectionMatrix = new Float32Array(16);
-        this.size = [0,0,0];
         this.frustumSize = [[0,0,0],[0,0,0]];
         this.frustumBox = [[0,0,0],[0,0,0]];
         this.bounds = new BoundingBox();
@@ -26,7 +25,6 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
 
     CameraComponent.prototype.constructor = CameraComponent;
 
-    CameraComponent.prototype.size = null;
     CameraComponent.prototype.bounds = null;
     CameraComponent.prototype.frustumSize = null;
     CameraComponent.prototype.frustumBox = null;
@@ -43,8 +41,6 @@ define(["../lib/gl-matrix","../Component", "../lib/BoundingBox"], function(glMat
     }
 
     CameraComponent.prototype.setup = function(width, height, length){
-        //update sizes
-        this.size = [width, height, length];
 
         //update frustum size
         this.frustumSize = [[-width/2,-height/2,0],[width/2,height/2,length]];

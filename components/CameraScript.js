@@ -1,4 +1,4 @@
-define(['../engine/engine'], function (scalia) {
+define(['../engine'], function (scalia) {
     function CameraScript() {
         this.tmpctx = document.createElement("canvas").getContext("2d");
         this.tmpctx.canvas.width = 1000;
